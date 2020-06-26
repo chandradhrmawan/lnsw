@@ -126,7 +126,7 @@ controller.insert =  async function(req, res){
 					await model.M_DetailBarangPelabuhan.bulkCreate(xlData).then((result)=>{
 						res.status(200).json({
 							code: '01',
-							message: 'Sukses'
+							message: xlData[0]
 						})
 					}).catch((err)=>{
 						res.status(404).json({

@@ -23,7 +23,7 @@ controller.getAll = async function (req, res, next) {
                         ],
             limit: limit,
             offset:page,
-            order:[['id_permohonan','asc']],
+            order:[['tgl_pengajuan','desc']],
             where: {
             [Op.or]: [
             {

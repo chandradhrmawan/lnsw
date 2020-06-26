@@ -89,8 +89,8 @@ controller.getOne = async function(req, res){
 						AND
 								id_barang= :id_barang`,{
 									replacements: {
-										id_permohonan: req.query.id_permohonan,
-										id_barang: req.query.id_barang
+										id_permohonan: req.params.id_permohonan,
+										id_barang: req.params.id_barang
 									}}).then((result)=>{
 										console.log(result.rowCount);
 											if(result[0].length > 0){
@@ -124,22 +124,34 @@ controller.insert =  async function(req, res){
 	try{
 		const postData = req.body;
 		const postDetailBarang = postData.detailBarang;
-		const postBarangPelabuhan = postData.detailPelabuhan;
+		const ObjectLength = Object.keys(postData).length;
+		console.log(ObjectLength);
 		await model.M_DetailBarang.create(postDetailBarang).then((result)=>{
-			if(postBarangPelabuhan.length != 0){
+			const data = result;
+			if(ObjectLength == 2){
+				const postBarangPelabuhan = postData.detailPelabuhan;
 				for(var i=0; i<postBarangPelabuhan.length; i++){
 						Object.assign(postBarangPelabuhan[i], {id_detailmasterlist_barang: result.id_detailmasterlist_barang});
 				}
 				model.M_DetailBarangPelabuhan.bulkCreate(postBarangPelabuhan).then((result)=>{
 					res.status(200).json({
 						code: '01',
-						message: result[0]
+						message: 'Sukses',
+						data: data,
+						data2: result
 					});
-				});			
+				}).catch((err)=>{
+					res.status(404).json({
+						code: '02',
+						message: err
+					});
+				});
 			}else{
+				console.log('berhasil');
 				res.status(200).json({
 					code: '01',
-					message: 'Sukses'
+					message: 'Sukses',
+					data: data
 				});
 			}
 		}).catch((err)=>{
