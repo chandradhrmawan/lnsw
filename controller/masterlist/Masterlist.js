@@ -12,7 +12,7 @@ const stripHexPrefix = require('strip-hex-prefix');
 const helpers    = require('../../helpers/global_helper');
 
 controller.getAll = async function (req, res, next) {
-    await model.masterList.findAll()
+    let data_masterlist = await model.masterList.findAll()
         .then((result) => {
             if (result.length > 0) {
                 res.status(200).json({
@@ -42,8 +42,42 @@ controller.generateKode = async function (req, res, next) {
 };
 
 controller.get = async function (req, res, next) {
-    const search = req.params.search;
-    await model.masterList.findAll({
+    const id_permohonan = req.params.search;
+    
+
+    const result = {}
+    result.pelaku_usaha = await model.masterList.findOne({
+        where:{
+            id_permohonan:id_permohonan
+        }
+    });
+
+    result.korespondensi = await model.M_Korespodensi.findOne({
+        where:{
+            id_permohonan:id_permohonan
+        }
+    });
+
+    result.wilayah_kerja = await model.M_WilayahKerja.findOne({
+        where:{
+            id_permohonan:id_permohonan
+        }
+    });
+
+    result.lokasi_proyek = await model.M_LokasiProyek.findOne({
+        where:{
+            id_permohonan:id_permohonan
+        }
+    });
+
+    res.status(200).json({
+        code: '01',
+        message: 'Sukses',
+        data: result
+    });
+
+
+    /*await model.masterList.findAll({
         where: {
             [Op.or]: [{
                 id_permohonan: {
@@ -69,7 +103,7 @@ controller.get = async function (req, res, next) {
             code: '02',
             message: err
         })
-    });
+    });*/
 };
 
 
@@ -147,20 +181,22 @@ controller.updateMasterList = async(req,res,next) => {
             kd_kota                 : rs1.kota,
             rt_rw_perusahaan        : rs1.rt_rw,
             alamat_perusahaan       : rs1.alamat,
-            kd_pos                  : rs1.kode_pos,
+            // kd_pos                  : rs1.kode_pos,
             no_telepon              : rs1.no_telp,
             email                   : rs1.email,
             no_fax                  : rs1.fax,
             nama_penanggung_jawab   : rs2.nama,
-            jbt_penanggungjawab     : rs2.jabatan,
+            jbt_penangungjawab      : rs2.jabatan,
             tgl_pengajuan           : rs4.tanggal_pengajuan,
             npwp                    : rs4.nomor_identitas,
             tujuan_kegiatan         : rs4.tujuan_kegiatan,
             kd_kek                  : rs4.kode_kek,
             kd_kppbc                : rs4.kode_kppbc,
             kelurahan               : rs4.kelurahan,
-            kd_pos                  : rs4.kd_pos
+            kd_pos                  : rs4.kode_pos
         }
+
+        console.log(ret.pelaku_usaha);
 
         ret.korespondensi = {
             id_permohonan           : req.params.id_permohonan,
@@ -180,7 +216,7 @@ controller.updateMasterList = async(req,res,next) => {
             rt_rw                   : rs5.rt_rw_proyek,
             daerah_kode             : rs5.kelurahan,
             kd_kota                 : rs5.kd_kota,
-            kode_pos                : rs5.kode_pos,
+            // kode_pos                : rs5.kode_pos,
             alamat                  : rs5.alamat
         }
 
