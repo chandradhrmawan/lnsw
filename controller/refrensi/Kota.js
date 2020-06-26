@@ -8,6 +8,7 @@ const {validationResult} = require('express-validator');
 controller.getAll = async function (req, res) {
     await model.kota.findAll({
         attributes: [
+            ['kd_kota', 'kd_kota'],
             ['id_kota', 'idKota'],
             ['ibu_kota', 'ibuKota'],
             ['nama_kota_kabupaten', 'namaKabupaten'],
@@ -39,6 +40,7 @@ controller.get = async function (req, res, next) {
     const search = req.params.search;
     await model.kota.findAll({
         attributes: [
+            ['kd_kota', 'kd_kota'],
             ['id_kota', 'idKota'],
             ['ibu_kota', 'ibuKota'],
             ['nama_kota_kabupaten', 'namaKabupaten'],
