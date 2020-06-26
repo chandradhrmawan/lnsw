@@ -14,7 +14,7 @@ controller.upload = async function (req, res) {
     console.log(req.body);
     if (validasiFile == '.pdf') {
         await model.dokumen.create({
-            kd_dokumen: req.body.KodeDokumen,
+            id_dokumen: req.body.KodeDokumen,
             nomor_dokumen: req.body.NoDokumen,
             tgl_dokumen: Date.now(),
             id_permohonan: req.body.PermohonanId,
@@ -56,7 +56,7 @@ controller.postData = async function (req, res) {
     try {
         transaction = await db.transaction();
         const newDocument = await model.dokumen.create({
-            kd_dokumen: req.body.KodeDokumen,
+            id_dokumen: req.body.KodeDokumen,
             nomor_dokumen: req.body.NoDokumen,
             tgl_dokumen: Date.now(),
             id_permohonan: req.body.PermohonanId,
@@ -100,7 +100,51 @@ controller.postData = async function (req, res) {
                 'data': {},
             })
         }
+    }
+}
 
+controller.deleteBarang = async function (req, res) {
+    let transaction;
+    const BarangId = req.params.barangId;
+    try {
+        const detail = await model.M_DetailBarang.findAll({
+            where: {
+                id_barang: BarangId
+            }
+        });
+        transaction = await db.transaction();
+        detail.forEach(hasil => {
+            const pelabuhan = model.M_DetailBarangPelabuhan.destroy({
+                where: {
+                    id_detailmasterlist_barang: hasil.id_detailmasterlist_barang
+                }
+            }, { transaction: transaction });
+        });
+        detail.forEach(el => {
+            const detailBarang = model.M_DetailBarang.destroy({
+                where: {
+                    id_detailmasterlist_barang: el.id_detailmasterlist_barang
+                }
+            }, { transaction: transaction });
+        });
+        await model.masterListBarang.destroy({
+            where: {
+                id_barang: BarangId
+            }
+        }, { transaction: transaction });
+        res.status(200).json({
+            'status': 'OK',
+            'messages': 'Masterlist Barang berhasil di Hapus'
+        })
+
+    } catch (err) {
+        if (transaction) {
+            await transaction.rollback()
+            res.status(400).json({
+                'status': 'ERROR',
+                'messages': err.message
+            })
+        }
 
     }
 }
@@ -274,6 +318,7 @@ controller.getNib = async function (req, res) {
             });
         });
 }
+
 function BarangInvoice() {
     let rndm = randomstring.generate({
         length: 4,

@@ -38,7 +38,7 @@ var masterListBarang = db.define('td_hdr_masterlistbarang',
 }
 );
 
-// masterListBarang.hasMany(M_DetailBarang, {foreignKey: 'id_barang'});
+masterListBarang.hasMany(M_DetailBarang, {foreignKey: 'id_barang'});
 // masterListBarang.belongsTo(Masterlist, { foreignKey: 'id_permohonan' });
 // Masterlist.hasOne(masterListBarang, { foreignKey: 'id_permohonan' });
 
@@ -46,7 +46,7 @@ masterListBarang.belongsTo(Perijinan, { foreignKey: 'kd_perijinan' });
 Perijinan.hasOne(masterListBarang, { foreignKey: 'kd_perijinan' });
 
 Dokumen.hasMany(masterListBarang, { foreignKey: 'id_dokumen' });
-masterListBarang.belongsTo(Dokumen, { foreignKey: 'kd_dokumen' });
+masterListBarang.belongsTo(Dokumen, { foreignKey: 'id_dokumen' });
 
 
 // masterListBarang.belongsTo(Incoterm, { foreignKey: 'incoterm' });

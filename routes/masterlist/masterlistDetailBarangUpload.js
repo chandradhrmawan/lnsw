@@ -29,8 +29,7 @@ const upload = multer({
 });
 
 router.get('/', controller.M_DetailBarangUpload.getAll);
-router.get('/:id_detailmasterlist_barang',
-	[check('id_detailmasterlist_barang').isNumeric().trim().escape()],
+router.get('/:id_permohonan/:id_barang',
 	controller.M_DetailBarangUpload.getOne);
 router.post('/', upload.single('file'), controller.M_DetailBarangUpload.insert);
 router.put('/:id_detailmasterlist_barang', upload.single('file'),

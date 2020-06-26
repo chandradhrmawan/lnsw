@@ -1,7 +1,5 @@
 const Sequelize = require('sequelize');
 const db = require('../../database/database');
-// const Incoterm = require('../refrensi/tr_incoterm_model');
-
 
 const masterDetilBarang = db.define('td_detail_masterlistbarang', {
 	id_detailmasterlist_barang: {
@@ -62,7 +60,5 @@ const masterDetilBarang = db.define('td_detail_masterlistbarang', {
 	freezeTableName: true,
 	timestamps: false
 });
-
-// masterDetilBarang.hasMany(Incoterm, {foreignKey: 'incoterm'});
 
 module.exports = masterDetilBarang;

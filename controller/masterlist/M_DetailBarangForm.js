@@ -114,41 +114,32 @@ controller.getOne = async function(req, res){
 
 controller.insert =  async function(req, res){
 	try{
-		console.log(req.body);
-		const errInput = validationResult(req);
-		if(errInput.isEmpty()){
-			await model.M_DetailBarang.create({
-				serial_num_urut: req.body.serial_num_urut,
-				kd_hs: req.body.kd_hs,
-				spesifikasi: req.body.spesifikasi,
-				jml_satuan: req.body.jml_satuan,
-				kd_satuan: req.body.kd_satuan,
-				jenis_fasilitas: req.body.jenis_fasilitas,
-				incoterm: req.body.incoterm,
-				kd_valuta: req.body.kd_valuta,
-				nilai: req.body.nilai,
-				id_dokumen: req.body.id_dokumen,
-				kd_detail_negara: req.body.kd_detail_negara,
-				berlaku: req.body.berlaku,
-				deskripsi_hs: req.body.deskripsi_hs,
-				ur_barang: req.body.ur_barang
-			}).then((result)=>{
+		const postData = req.body;
+		const postDetailBarang = postData.detailBarang;
+		const postBarangPelabuhan = postData.detailPelabuhan;
+		await model.M_DetailBarang.create(postDetailBarang).then((result)=>{
+			if(postBarangPelabuhan.length != 0){
+				for(var i=0; i<postBarangPelabuhan.length; i++){
+						Object.assign(postBarangPelabuhan[i], {id_detailmasterlist_barang: result.id_detailmasterlist_barang});
+				}
+				model.M_DetailBarangPelabuhan.bulkCreate(postBarangPelabuhan).then((result)=>{
+					res.status(200).json({
+						code: '01',
+						message: 'Sukses'
+					});
+				});			
+			}else{
 				res.status(200).json({
 					code: '01',
 					message: 'Sukses'
 				});
-			}).catch((err)=>{
-				res.status(404).json({
-					code: '02',
-					message: err
-				});
-			});
-		}else{
+			}
+		}).catch((err)=>{
 			res.status(404).json({
 				code: '02',
-				message: errInput
+				message: err				
 			});
-		}
+		});
 	}catch(err){
 		res.status(404).json({
 			code: '02',

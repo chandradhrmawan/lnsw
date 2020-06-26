@@ -57,59 +57,50 @@ controller.getAll = async function(req, res){
 
 controller.getOne = async function(req, res){
 	try{
-
 		const errInput = validationResult(req);
 		if(errInput.isEmpty()){
-			await model.M_DetailBarang.findAll({
-				attribute: [
-							['id_detailmasterlist_barang', 'id_detail_masterlist_barang'],
-							['serial_num_urut','serial_num_urut'],
-							['kd_hs', 'kd_hs'],
-							['spesifikasi', 'spesifikasi'],
-							['jml_satuan', 'jml_satuan'],
-							['kd_satuan','kd_satuan'],
-							['jenis_fasilitas', 'jenis_fasilitas'],
-							['incoterm','incoterm'],
-							['kd_valuta', 'kd_valuta'],
-							['nilai','nilai'],
-							['id_dokumen','id_dokumen'],
-							['kd_detail_negara','kd_detail_negara'],
-							['berlaku','berlaku'],
-							['deskripsi_hs','deskripsi_hs'],
-							['ur_barang','ur_barang']
-						],
-				where: {
-					id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+			const [result, metadata] = await db.query(`SELECT
+									*
+							FROM
+									masterlist.td_detail_masterlistbarang A
+							LEFT JOIN
+									masterlist.td_hdr_masterlistbarang B
+							ON
+									A.id_barang = B.id_barang
+							LEFT JOIN
+									refrensi.tr_satuan C 
+							ON
+									A.kd_satuan = C.kd_satuan
+							WHERE
+									B.id_permohonan = :id_permohonan
+							AND
+									A.id_barang = :id_barang`,{
+										replacements: {
+											id_permohonan: req.params.id_permohonan,
+											id_barang: req.params.id_barang
+										}
+									});
+				if(result.length > 0){
+					res.status(200).json({
+						code: '01',
+						message: 'Sukses',
+						data: result
+					})
+				}else{
+					res.status(200).json({
+						code:'01',
+						message: 'Tidak ada data'
+					});
 				}
-			}).then((result)=>{
-						if(result.length > 0){
-							res.status(200).json({
-								code: '01',
-								message: 'Sukses',
-								data: result
-							});
-						}else{
-							res.status(200).json({
-								code: '01',
-								message: 'Sukses',
-								data: 'Tidak ada data'
-							});
-						}
-				}).catch((err)=>{
-						res.status(404).json({
-							code: '02',
-							message: err
-						});
-			});
-		}else{
-			res.status(404).json({
-				code: '02',
-				message: errInput.array()
-			});
-		}
+			}else{
+				res.status(404).json({
+					code: '02',
+					message: err
+				})
+			}
 	}catch(err){
 		res.status(404).json({
-			code: '02',
+			code: '01',
 			message: err
 		});
 	}

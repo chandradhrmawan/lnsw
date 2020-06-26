@@ -133,6 +133,10 @@ router.get('/getAll/:Nib/:PermohonanId', function (req, res) {
 router.get('/getAll/:Nib', function (req, res) {
     controller.masterListBarang.getNib(req, res)
 });
+
+router.delete('/:barangId', function (req, res) {
+    controller.masterListBarang.deleteBarang(req, res)
+});
 // router.get('/generate', controller.masterListBarang.generateNumber);
 // router.post('');
 // router.post('/FormData', upload.single('path'), controller.masterListBarang.postDataForm);
