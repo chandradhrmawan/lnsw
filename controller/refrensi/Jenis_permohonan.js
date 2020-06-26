@@ -1,0 +1,118 @@
+const model = require('../../config/model/index');
+const { Op } = require('sequelize');
+const controller = {};
+const path = require('path');
+const moment = require('moment');
+const {validationResult} = require('express-validator');
+
+controller.getAll = async function (req, res) {
+    await model.jenis_permohonan.findAll({
+        attributes: [['kd_jenis_permohonan', 'kodeJenisPermohonan'], ['ur_permohonan', 'permohonan']]
+    })
+        .then((result) => {
+            if (result.length > 0) {
+                res.status(200).json({
+                    code: '01',
+                    message: 'Sukses',
+                    data: result
+                });
+            } else {
+                res.status(404).json({
+                    code: '01',
+                    message: 'Tidak Ada Data'
+                })
+            }
+        }).catch((err) => {
+            res.status(400).json({
+                code: '02',
+                message: err
+            });
+        })
+};
+
+controller.get = async function (req, res, next) {
+    const search = req.params.search;
+    await model.jenis_permohonan.findAll({
+        attributes: [['kd_jenis_permohonan', 'kodeJenisPermohonan'], ['ur_permohonan', 'permohonan']],
+        where: {
+            ur_permohonan: {
+                [Op.iLike]: '%' + search + '%'
+            }
+        }
+    }).then((result) => {
+        if (result.length > 0) {
+            res.status(200).json({
+                code: '01',
+                message: 'Sukses',
+                data: result
+            });
+        } else {
+            res.status(404).json({
+                code: '01',
+                message: 'Tidak Ada Data'
+            });
+        }
+    }).catch((err) => {
+        // console.log(err);
+        res.status(400).json({
+            code: '02',
+            message: err
+        })
+    });
+};
+
+controller.post = async function (req, res) {
+    const errInput = validationResult(req);
+    if(errInput.isEmpty()){
+        await model.jenis_permohonan.create({
+            kd_jenis_permohonan: req.body.kd_jenis_permohonan,
+            ur_permohonan: req.body.ur_permohonan
+        }).then((result) => {
+            res.status(201).json({
+                code: '01',
+                message: 'Jenis Permohonan berhasil ditambahkan',
+                data: result
+            })
+        }).catch ((err) => {
+            res.status(404).json({
+                code: '02',
+                message: err
+            })
+        });
+    }else{
+        res.status(404).json({
+            code: '02',
+            message: errInput
+        });
+    }
+};
+
+controller.update = async function(req, res){
+    const errInput = validationResult(req);
+	if(errInput.isEmpty()){
+		await model.jenis_permohonan.update({
+			ur_permohonan: req.body.ur_permohonan
+		},{
+			where: {
+				kd_jenis_permohonan: req.params.kd_jenis_permohonan
+			}
+		}).then(result => {
+			res.status(200).json({
+				code: '01',
+				message: 'Jenis Permohonan berhasil Diubah',
+			})
+		}).catch(err => {
+			res.status(404).json({
+				code: '02',
+				message: err
+			})
+		});
+	}else{
+        res.status(404).json({
+            code: '02',
+            message: errInput
+        });
+    }	
+};
+
+module.exports = controller;
