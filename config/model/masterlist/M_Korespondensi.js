@@ -2,10 +2,8 @@ const Sequelize = require('sequelize');
 const db = require('../../database/database');
 
 const masterKoresponden = db.define('td_korespodensi', {
-	id_korespodensi: {
-		type: Sequelize.BIGINT,
-		primaryKey:true,
-		autoIncrement:true,
+	id_korespondensi: {
+		type: Sequelize.BIGINT
 	},
 	id_permohonan: {
 		type: Sequelize.CHAR(17)
@@ -43,4 +41,5 @@ const masterKoresponden = db.define('td_korespodensi', {
 	timestamps: false
 });
 
+masterKoresponden.removeAttribute('id');
 module.exports = masterKoresponden;

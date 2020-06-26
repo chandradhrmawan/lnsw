@@ -61,7 +61,7 @@ controller.getAllMenu = async function (req, res, next) {
         url: '/layanan-pelaporan',
         icon: 'fa fa-file-text-o',
       },
-      /*{
+      {
         name: "Form Wizard",
         url: "/formwizard",
         icon: "icon-note",
@@ -70,7 +70,7 @@ controller.getAllMenu = async function (req, res, next) {
         name: "UI5 Icon",
         url: "/ui5icon",
         icon: "icon-emotsmile",
-      },*/
+      },
     ];
   
     res.json({

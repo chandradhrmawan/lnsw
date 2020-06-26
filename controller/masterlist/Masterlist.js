@@ -12,7 +12,7 @@ const stripHexPrefix = require('strip-hex-prefix');
 const helpers    = require('../../helpers/global_helper');
 
 controller.getAll = async function (req, res, next) {
-    let data_masterlist = await model.masterList.findAll()
+    await model.masterList.findAll()
         .then((result) => {
             if (result.length > 0) {
                 res.status(200).json({
@@ -42,42 +42,8 @@ controller.generateKode = async function (req, res, next) {
 };
 
 controller.get = async function (req, res, next) {
-    const id_permohonan = req.params.search;
-    
-
-    const result = {}
-    result.pelaku_usaha = await model.masterList.findOne({
-        where:{
-            id_permohonan:id_permohonan
-        }
-    });
-
-    result.korespondensi = await model.M_Korespodensi.findOne({
-        where:{
-            id_permohonan:id_permohonan
-        }
-    });
-
-    result.wilayah_kerja = await model.M_WilayahKerja.findOne({
-        where:{
-            id_permohonan:id_permohonan
-        }
-    });
-
-    result.lokasi_proyek = await model.M_LokasiProyek.findOne({
-        where:{
-            id_permohonan:id_permohonan
-        }
-    });
-
-    res.status(200).json({
-        code: '01',
-        message: 'Sukses',
-        data: result
-    });
-
-
-    /*await model.masterList.findAll({
+    const search = req.params.search;
+    await model.masterList.findAll({
         where: {
             [Op.or]: [{
                 id_permohonan: {
@@ -103,7 +69,7 @@ controller.get = async function (req, res, next) {
             code: '02',
             message: err
         })
-    });*/
+    });
 };
 
 
@@ -161,99 +127,86 @@ controller.post = async function (req, res) {
 };
 
 controller.updateMasterList = async(req,res,next) => {
+    let rs1 = req.body.pelaku_usaha[0];
+    let rs2 = req.body.penanggung_jawab[0];
+    let rs3 = req.body.korespondensi[0];
+    let rs4 = req.body.data_pengajuan[0];
+
+    let rs5 = req.body.wilayah_kerja[0];
+    let rs6 = req.body.lokasi_proyek[0];
+
+
+    let ret = {};
     
-    try{
-
-        let rs1 = req.body.pelaku_usaha[0];
-        let rs2 = req.body.penanggung_jawab[0];
-        let rs3 = req.body.korespondensi[0];
-        let rs4 = req.body.data_pengajuan[0];
-
-        let rs5 = req.body.wilayah_kerja[0];
-        let rs6 = req.body.lokasi_proyek[0];
-
-
-        let ret = {};
-        
-        ret.pelaku_usaha = {
-            nib                     : rs1.nib,
-            nama_perusahaan         : rs1.nama_perseroan,
-            kd_kota                 : rs1.kota,
-            rt_rw_perusahaan        : rs1.rt_rw,
-            alamat_perusahaan       : rs1.alamat,
-            // kd_pos                  : rs1.kode_pos,
-            no_telepon              : rs1.no_telp,
-            email                   : rs1.email,
-            no_fax                  : rs1.fax,
-            nama_penanggung_jawab   : rs2.nama,
-            jbt_penangungjawab      : rs2.jabatan,
-            tgl_pengajuan           : rs4.tanggal_pengajuan,
-            npwp                    : rs4.nomor_identitas,
-            tujuan_kegiatan         : rs4.tujuan_kegiatan,
-            kd_kek                  : rs4.kode_kek,
-            kd_kppbc                : rs4.kode_kppbc,
-            kelurahan               : rs4.kelurahan,
-            kd_pos                  : rs4.kode_pos
-        }
-
-        console.log(ret.pelaku_usaha);
-
-        ret.korespondensi = {
-            id_permohonan           : req.params.id_permohonan,
-            tipe_korespodensi       : rs3.tipe_korespondensi,
-            nama_korespodensi       : rs3.nama,
-            jbt_korespodensi        : rs3.jabatan,
-            alamat_korespodensi     : rs3.alamat,
-            jenis_identitas         : rs3.jenis_identitas,
-            nomor_identias          : rs3.nomor_identitas,
-            no_telepon              : rs3.no_telp,
-            no_hp                   : rs3.no_telp,
-            email                   : rs3.email
-        }
-
-        ret.wilayah_kerja = {
-            id_permohonan           : req.params.id_permohonan,
-            rt_rw                   : rs5.rt_rw_proyek,
-            daerah_kode             : rs5.kelurahan,
-            kd_kota                 : rs5.kd_kota,
-            // kode_pos                : rs5.kode_pos,
-            alamat                  : rs5.alamat
-        }
-
-        ret.lokasi_proyek = {
-            id_permohonan           : req.params.id_permohonan,
-            rt_rw_proyek            : rs6.rt_rw_proyek,
-            kelurahan               : rs6.kelurahan,
-            kd_kota                 : rs6.kd_kota,
-            kode_pos                : rs6.kode_pos,
-            alamat                  : rs6.alamat
-        }
-
-
-        let master = await model.masterList.update(ret.pelaku_usaha,{
-            where:{
-                id_permohonan : req.params.id_permohonan
-            }
-        });
-
-        let korespodensi  = await model.M_Korespodensi.create(ret.korespondensi);
-        let wilayah_kerja = await model.M_WilayahKerja.create(ret.wilayah_kerja);
-        let lokasi_proyek = await model.M_LokasiProyek.create(ret.lokasi_proyek);
-
-
-        res.status(200).json({
-            code     : '01',
-            message  : 'Success',
-            response : ret
-        })
-
-    }catch(err){
-        res.status(200).json({
-            code     : '02',
-            message  : 'error',
-            data     : {}
-        })
+    ret.pelaku_usaha = {
+        nib                     : rs1.nib,
+        nama_perusahaan         : rs1.nama_perseroan,
+        kd_kota                 : rs1.kota,
+        rt_rw_perusahaan        : rs1.rt_rw,
+        alamat_perusahaan       : rs1.alamat,
+        kd_pos                  : rs1.kode_pos,
+        no_telepon              : rs1.no_telp,
+        email                   : rs1.email,
+        no_fax                  : rs1.fax,
+        nama_penanggung_jawab   : rs2.nama,
+        jbt_penanggungjawab     : rs2.jabatan,
+        tgl_pengajuan           : rs4.tanggal_pengajuan,
+        npwp                    : rs4.nomor_identitas,
+        tujuan_kegiatan         : rs4.tujuan_kegiatan,
+        kd_kek                  : rs4.kode_kek,
+        kd_kppbc                : rs4.kode_kppbc,
+        kelurahan               : rs4.kelurahan,
+        kd_pos                  : rs4.kd_pos
     }
+
+    ret.korespondensi = {
+        id_permohonan           : req.params.id_permohonan,
+        tipe_korespodensi       : rs3.tipe_korespondensi,
+        nama_korespodensi       : rs3.nama,
+        jbt_korespodensi        : rs3.jabatan,
+        alamat_korespodensi     : rs3.alamat,
+        jenis_identitas         : rs3.jenis_identitas,
+        nomor_identias          : rs3.nomor_identitas,
+        no_telepon              : rs3.no_telp,
+        no_hp                   : rs3.no_telp,
+        email                   : rs3.email
+    }
+
+    ret.wilayah_kerja = {
+        id_permohonan           : req.params.id_permohonan,
+        rt_rw                   : rs5.rt_rw_proyek,
+        daerah_kode             : rs5.kelurahan,
+        kd_kota                 : rs5.kd_kota,
+        kode_pos                : rs5.kode_pos,
+        alamat                  : rs5.alamat
+    }
+
+    ret.lokasi_proyek = {
+        id_permohonan           : req.params.id_permohonan,
+        rt_rw_proyek            : rs6.rt_rw_proyek,
+        kelurahan               : rs6.kelurahan,
+        kd_kota                 : rs6.kd_kota,
+        kode_pos                : rs6.kode_pos,
+        alamat                  : rs6.alamat
+    }
+
+
+    let master = await model.masterList.update(ret.pelaku_usaha,{
+        where:{
+            id_permohonan : req.params.id_permohonan
+        }
+    });
+
+    let korespodensi  = await model.M_Korespodensi.create(ret.korespondensi);
+    let wilayah_kerja = await model.M_WilayahKerja.create(ret.wilayah_kerja);
+    let lokasi_proyek = await model.M_LokasiProyek.create(ret.lokasi_proyek);
+
+
+    res.status(200).json({
+        code     : '01',
+        message  : 'Success',
+        response : ret
+    })
 }
 
 
