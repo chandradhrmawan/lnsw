@@ -6,6 +6,12 @@ const moment = require('moment');
 const {validationResult} = require('express-validator');
 
 controller.getAll = async function (req, res) {
+    const today = moment(Date.now());
+    const weekstart = moment().startOf('isoweek');
+    const rabu = moment().startOf('isoweek').add(2, 'days');
+    const weekend = moment().endOf('isoweek');
+    const selasa = moment().endOf('isoweek').add(2, 'days');
+    console.log(today, rabu, selasa);
     await model.kurs.findAll({
         attributes: [
             ['kd_kurs', 'kdKurs'],
@@ -14,7 +20,12 @@ controller.getAll = async function (req, res) {
             ['nilai', 'nilai'],
             ['ket', 'keterangan'],
             ['create_dt', 'create_date']
-        ]
+        ],
+        where : {
+            create_dt: {
+                [Op.between]: [rabu, selasa]
+            }
+        }
     })
         .then((result) => {
             if (result.length > 0) {

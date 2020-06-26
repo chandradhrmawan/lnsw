@@ -2,113 +2,121 @@ const model = require('../../config/model/index');
 const controller = {};
 const path = require('path');
 const {validationResult} = require('express-validator');
+const db = require('../../config/database/database');
 
 controller.getAll = async function(req, res){
 	try{
-
-	await model.M_DetailBarang.findAll({
-		attribute: [
-					['id_detailmasterlist_barang', 'id_detail_masterlist_barang'],
-					['serial_num_urut','serial_num_urut'],
-					['kd_hs', 'kd_hs'],
-					['spesifikasi', 'spesifikasi'],
-					['jml_satuan', 'jml_satuan'],
-					['kd_satuan','kd_satuan'],
-					['jenis_fasilitas', 'jenis_fasilitas'],
-					['incoterm','incoterm'],
-					['kd_valuta', 'kd_valuta'],
-					['nilai','nilai'],
-					['id_dokumen','id_dokumen'],
-					['kd_detail_negara','kd_detail_negara'],
-					['berlaku','berlaku'],
-					['deskripsi_hs','deskripsi_hs'],
-					['ur_barang','ur_barang']
-				]
-		}).then((result)=>{
-					if(result.length > 0){
-						res.status(200).json({
-							code: '01',
-							message: 'Sukses',
-							data: result
-						});
-					}else{
-						res.status(200).json({
-							code: '01',
-							message: 'Sukses',
-							data: 'Tidak ada data'
-						});
-					}
-		}).catch((err)=>{
-					res.status(404).json({
-						code: '02',
-						message: err
-					});
-		});
+		await db.query(`SELECT
+							DISTINCT
+								A.*,
+								B.hd_code_format,
+								B.id_takik,
+								B.uraian_id,
+								B.uraian_en,
+								B.bm_mfn,
+								B.no_skep,
+								B.tanggal_skep,
+								B.berlaku,
+								B.fl_use,
+								B.create_dt,
+								C.ur_satuan,
+								D.ur_incoterm,
+								E.ur_valuta,
+								F.kd_dokumen,
+								F.nomor_dokumen,
+								F.tgl_dokumen,
+								F.filename_dokumen,
+								F.id_permohonan,
+								F.no_seri_dokumen,
+								F.nib
+						FROM
+								masterlist.td_detail_masterlistbarang A
+						LEFT JOIN
+								refrensi.tr_hscode B ON A.kd_hs = B.kd_hs
+						LEFT JOIN
+								refrensi.tr_satuan C ON A.kd_satuan = C.kd_satuan
+						LEFT JOIN
+								refrensi.tr_incoterm D ON A.incoterm = D.incoterm
+						LEFT JOIN
+								refrensi.tr_valuta E ON A.kd_valuta = E.kd_valuta
+						LEFT JOIN
+								masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen`).then((result)=>{
+									console.log(result[0].length);
+									if(result[0].length > 0){
+										res.status(200).json({
+											code: '01',
+											message: 'Sukses',
+											data: result[0]
+										});
+									}else{
+										res.status(200).json({
+											code: '02',
+											message: 'Sukse',
+											data: 'Tidak ada Data'
+										});
+									}
+								});
 	}catch(err){
-		res.status(404).json({
+		res.status(200).json({
 			code: '02',
 			message: err
-		})
+		});
 	}
 }
 
 
 controller.getOne = async function(req, res){
 	try{
-		const errInput = validationResult(req);
-		if(errInput.isEmpty()){
-			await model.M_DetailBarang.findAll({
-				attribute: [
-							['id_detailmasterlist_barang', 'id_detail_masterlist_barang'],
-							['serial_num_urut','serial_num_urut'],
-							['kd_hs', 'kd_hs'],
-							['spesifikasi', 'spesifikasi'],
-							['jml_satuan', 'jml_satuan'],
-							['kd_satuan','kd_satuan'],
-							['jenis_fasilitas', 'jenis_fasilitas'],
-							['incoterm','incoterm'],
-							['kd_valuta', 'kd_valuta'],
-							['nilai','nilai'],
-							['id_dokumen','id_dokumen'],
-							['kd_detail_negara','kd_detail_negara'],
-							['berlaku','berlaku'],
-							['deskripsi_hs','deskripsi_hs'],
-							['ur_barang','ur_barang']
-						],
-				where: {
-					id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
-				}
-			}).then((result)=>{
-						if(result.length > 0){
-							res.status(200).json({
-								code: '01',
-								message: 'Sukses',
-								data: result
-							});
-						}else{
-							res.status(200).json({
-								code: '01',
-								message: 'Sukses',
-								data: 'Tidak ada data'
-							});
-						}
-				}).catch((err)=>{
-						res.status(404).json({
-							code: '02',
-							message: err
-						});
-			});
-		}else{
-			res.status(404).json({
-				code: '02',
-				status: 'Data Tidak Valid'
-			});
-		}
+		await db.query(`SELECT
+								A.*,
+								B.*
+						FROM
+								masterlist.v_masterlist_detail A
+						LEFT JOIN
+								masterlist.td_detailbrg_pelabuhan B
+						ON
+								A.id_detailmasterlist_barang = B.id_detailmasterlist_barang
+						LEFT JOIN
+								refrensi.tr_negara C
+						ON
+								B.kd_negara = C.kd_negara
+						LEFT JOIN
+								refrensi.tr_pelabuhan D
+						ON
+								B.kd_pelabuhan = D.kd_pelabuhan
+						WHERE
+								id_permohonan= :id_permohonan
+						AND
+								id_barang= :id_barang`,{
+									replacements: {
+										id_permohonan: req.query.id_permohonan,
+										id_barang: req.query.id_barang
+									}}).then((result)=>{
+										console.log(result.rowCount);
+											if(result[0].length > 0){
+												res.status(200).json({
+													code: '01',
+													message: 'Sukses',
+													data: result[0]
+												});
+											}else{
+												res.status(200).json({
+													code: '01',
+													message: 'Sukses',
+													data: 'Tidak ada data'
+												});
+											}
+									}).catch((err)=>{
+										res.status(404).json({
+											code: '02',
+											message: err
+										})
+									});
 	}catch(err){
-		res.status(404).json({
+		res.status(200).json({
 			code: '02',
 			message: err
-		});
+		})
 	}
 }
 
@@ -125,7 +133,7 @@ controller.insert =  async function(req, res){
 				model.M_DetailBarangPelabuhan.bulkCreate(postBarangPelabuhan).then((result)=>{
 					res.status(200).json({
 						code: '01',
-						message: 'Sukses'
+						message: result[0]
 					});
 				});			
 			}else{
@@ -150,84 +158,89 @@ controller.insert =  async function(req, res){
 
 controller.update = async function(req, res){
 	try{
-		console.log(req.body);
-		const errInput = validationResult(req);
-		if(errInput.isEmpty()){
-			await model.M_DetailBarang.update({
-				serial_num_urut: req.body.serial_num_urut,
-				kd_hs: req.body.kd_hs,
-				spesifikasi: req.body.spesifikasi,
-				jml_satuan: req.body.jml_satuan,
-				kd_satuan: req.body.kd_satuan,
-				jenis_fasilitas: req.body.jenis_fasilitas,
-				incoterm: req.body.incoterm,
-				kd_valuta: req.body.kd_valuta,
-				nilai: req.body.nilai,
-				id_dokumen: req.body.id_dokumen,
-				kd_detail_negara: req.body.kd_detail_negara,
-				berlaku: req.body.berlaku,
-				deskripsi_hs: req.body.deskripsi_hs,
-				ur_barang: req.body.ur_barang
-			},{
-				where: {
-					id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+		const updateData = req.body;
+		const updateDetailBarang = updateData.detailBarang;
+		const updateBarangPelabuhan = updateData.detailPelabuhan;
+		// console.log(updateBarangPelabuhan[0]);
+		await model.M_DetailBarang.update(updateDetailBarang,{
+			where: {
+				id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+			}
+		}).then((result)=>{
+				// res.status(200).json({
+				// 	Mencoba: updateBarangPelabuhan.length
+				// });
+				console.log(updateBarangPelabuhan.length);
+				if(updateBarangPelabuhan.length > 0){
+					model.M_DetailBarangPelabuhan.update(updateBarangPelabuhan[0],{
+						where:{
+							id_detailbrg_pelabuhan: req.params.id_detailbrg_pelabuhan
+						}
+					}).then((ok)=>{
+						res.status(200).json({
+							code: '01',
+							message: 'Sukses'
+						});
+					}).catch((err)=>{
+						re.status(404).json({
+							code: '02',
+							message: 'Tidak Berhasil'
+						})
+					});
+				}else{
+					res.status(200).json({
+						code: '01',
+						message: 'Sukses'
+					});
 				}
-			}).then((result)=>{
-				res.status(200).json({
-					code: '01',
-					message: 'Sukses'
-				});
-			}).catch((err)=>{
-				res.status(404).json({
-					code: '02',
-					message: err
-				});
-			});
-		}else{
+		}).catch((err)=>{
 			res.status(404).json({
 				code: '02',
-				message: errInput.array()
-			});		
-		}
+				message: err
+			})
+		}); 
 	}catch(err){
 		res.status(404).json({
-			code: '02',
+			status: '02',
 			message: err
-		})
+		});
 	}
 }
 
 controller.delete = async function(req, res){
-	try{
-		const errInput = validationResult(req);
-		if(errInput.isEmpty()){
-			await model.M_DetailBarang.destroy({
-				where: {
-					id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
-				}
-			}).then((result)=>{
-				res.status(200).json({
-					code: '01',
-					message: 'Sukses'
-				});
-			}).catch((err)=>{
-				res.status(404).json({
-					code: '02',
-					message: err
-				});
-			});
-		}else{
-			res.status(404).json({
-				code: '02',
-				message: 'Data Tidak Valid'
-			});		
-		}
-	}catch(err){
-		res.status(404).json({
-			code: '02',
-			message: err
-		})
-	}
+	await db.query(`DELETE FROM 
+							masterlist.td_detail_masterlistbarang
+					WHERE
+							id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
+								replacements: {
+									id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+								}
+							}).then((result)=>{
+								db.query(`DELETE FROM
+												masterlist.td_detailbrg_pelabuhan
+										  WHERE
+										  		id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
+										  			replacements: {
+										  				id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+										  			}
+										  		}).then((result)=>{
+										  			res.status(200).json({
+										  				code: '01',
+										  				message: 'Sukses'
+										  			});
+										  		}).catch((err)=>{
+										  			res.status(200).json({
+										  				code: '02',
+										  				message: err
+										  			});
+										  		});
+							}).catch((err)=>{
+								res.status(404).json({
+									code: '02',
+									message: err
+								})
+							});
+
 }
 
 

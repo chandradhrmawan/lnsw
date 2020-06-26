@@ -20,9 +20,9 @@ helpers.createLog = function (param) {
 	  	} 
 	  	data_log = Object.assign({}, data_log);
 	  	const save_log = model.tb_log.create(data_log)
-	  	console.log(save_log);
+	  	return
     }catch(err) {
-    	return false;
+    	console.log(err);
     }
 }
 
@@ -41,7 +41,7 @@ helpers.sendEmail = function(id_permohonan){
 					    "fullName": "John Doe",
 					    "tokenClient": "kaskd",
 					    "phoneNumber": "085",
-					    "mailTo": "chandradaramawan17@gmail.com"
+					    "mailTo": email
 					  },
 					  "contents": {
 					    "data:": {
@@ -57,9 +57,8 @@ helpers.sendEmail = function(id_permohonan){
 					    }
 					  }
 					};
-		let ret = queue.publishExchange('lnsw.e.notice', 'direct', 'notice.email', JSON.stringify(message));
+		queue.publishExchange('lnsw.e.notice', 'direct', 'notice.email', JSON.stringify(message));
 		console.log(message);
-		console.log(ret);
 		return true;
 
 	}).catch((err) => {
