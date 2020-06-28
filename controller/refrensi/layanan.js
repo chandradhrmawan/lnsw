@@ -34,7 +34,28 @@ controller.getAll = async function (req, res) {
 };
 
 controller.get = async function (req, res, next) {
-    
+    let kd_layanan = req.query.kd_layanan;
+    await model.layanan.findOne({
+        attributes: [
+            ['kd_layanan', 'kd_layanan'],
+            ['nama_layanan', 'nama_layanan']
+        ],
+        where:{
+            kd_layanan:kd_layanan
+        }
+    })
+        .then((result) => {
+            res.status(200).json({
+                code: '01',
+                message: 'Sukses',
+                data: result
+            });
+        }).catch((err) => {
+            res.status(400).json({
+                code: '02',
+                message: err
+            });
+        })
 };
 
 controller.post = async function (req, res) {

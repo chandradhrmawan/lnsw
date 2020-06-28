@@ -31,7 +31,8 @@ controller.getAll = async function(req, res){
 								F.no_seri_dokumen,
 								H.ur_jenis_dokumen,
 								G.id_permohonan,
-								G.nib
+								G.nib,
+								I.id_permohonan
 						FROM
 								masterlist.td_detail_masterlistbarang A
 						LEFT JOIN
@@ -48,6 +49,8 @@ controller.getAll = async function(req, res){
 								masterlist.td_hdr_masterlistbarang G ON A.id_barang = G.id_barang
 						LEFT JOIN
 								refrensi.tr_jenis_dokumen H on F.kd_dokumen = H.kd_dokumen
+						LEFT JOIN
+								masterlist.td_hdr_masterlistbarang I ON A.id_barang = I.id_barang
 						ORDER BY
 								A.id_detailmasterlist_barang ASC`).then((result)=>{
 									console.log(result[0].length);
@@ -100,7 +103,8 @@ controller.getOne = async function(req, res){
 								F.id_permohonan,
 								F.no_seri_dokumen,
 								F.nib,
-								G.ur_jenis_dokumen
+								G.ur_jenis_dokumen,
+								H.id_permohonan
 						FROM
 							masterlist.td_detail_masterlistbarang A
 						LEFT JOIN
@@ -114,11 +118,13 @@ controller.getOne = async function(req, res){
 						LEFT JOIN
 							masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen
 						LEFT JOIN
-							refrensi.tr_jenis_dokumen G on F.kd_dokumen = F.kd_dokumen
+							refrensi.tr_jenis_dokumen G on F.kd_dokumen = G.kd_dokumen
+						LEFT JOIN
+							masterlist.td_hdr_masterlistbarang H ON A.id_barang = H.id_barang
 						WHERE
-							A.id_permohonan = :id_permohonan
+							H.id_permohonan = :id_permohonan
 						AND
-							A.id_barang = id_barang`,{
+							A.id_barang = :id_barang`,{
 									replacements: {
 										id_permohonan: req.params.id_permohonan,
 										id_barang: req.params.id_barang
