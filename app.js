@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const fileUpload = require('express-fileupload');
+// const fileUpload = require('express-fileupload');
 
 const db = require('./config/database/mysql');
 const cors = require('cors');
@@ -15,7 +15,7 @@ const app = express();
 const route = express.Router();
 app.use(helmet());
 app.use(cors());
-app.use(fileUpload());
+// app.use(fileUpload());
 
 
 app.use(require('sanitize').middleware);
@@ -31,6 +31,7 @@ app.use(express.static(path.join(__dirname)));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTER REFRENSI
+// app.use(fileUpload());
 app.use('/api/satuan', link.satuanRouter);
 app.use('/api/kota', link.kotaRouter);
 app.use('/api/negara', link.negaraRouter);
@@ -89,6 +90,7 @@ app.use('/api/pg', link.pgRoute);
 
 // Format Excel & Send Notification
 app.use('/api/tamplateExcel', link.tamplateExcel);
+app.use('/api/masterlist/updateDetailDokumen', link.updateDokumenBarang);
 // End Format Excel & Send Notification
 
 app.use('/api/log', link.log);

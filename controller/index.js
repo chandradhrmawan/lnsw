@@ -5,6 +5,7 @@ const masterListBarang = require('./masterlist/MasterlistBarang');
 
 const M_DetailBarangUpload = require('./masterlist/M_DetailBarangUpload');
 const M_DetailBarangForm = require('./masterlist/M_DetailBarangForm');
+const updateDetailDokumen = require('./masterlist/updateDokumenMasterlist');
 const M_DetailBarangPelabuhan = require('./masterlist/M_DetailBarangPelabuhan');
 const M_Korespodensi = require('./masterlist/M_Korespodensi');
 const M_LokProyek = require('./masterlist/M_LokasiProyek');
@@ -91,6 +92,7 @@ controller.login = login;
 
 controller.M_DetailBarangUpload = M_DetailBarangUpload;
 controller.M_DetailBarangForm = M_DetailBarangForm;
+controller.updateDetailDokumen = updateDetailDokumen;
 controller.M_DetailBarangPelabuhan = M_DetailBarangPelabuhan;
 controller.M_Korespodensi = M_Korespodensi;
 controller.M_LokProyek = M_LokProyek;

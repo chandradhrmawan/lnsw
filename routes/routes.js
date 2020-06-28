@@ -22,6 +22,7 @@ const daerahRoute = require('./refrensi/daerah');
 const fake = require('./fake/fake');
 const masterlistDetailBarangUpload = require('./masterlist/masterlistDetailBarangUpload');
 const masterlistDetailBarangForm = require('./masterlist/masterlistDetailBarangForm');
+const updateDokumenBarang = require('./masterlist/updateDokumenBarang');
 const masterlistKorespodensi = require('./masterlist/masterlistKorespoden');
 const masterlistBarangPelabuhan = require('./masterlist/masterlistBarangPelabuhan');
 const masterlistLokasiProyek = require('./masterlist/masterlistLokasiProyek');
@@ -64,6 +65,7 @@ module.exports = {
     refrensiRouter: refrensi,
     masterlistDetailBarangUpload: masterlistDetailBarangUpload,
     masterlistDetailBarangForm: masterlistDetailBarangForm,
+    updateDokumenBarang: updateDokumenBarang,
     masterlistBarangPelabuhan: masterlistBarangPelabuhan,
     masterlistKorespodensi: masterlistKorespodensi,
     masterlistLokasiProyek: masterlistLokasiProyek,

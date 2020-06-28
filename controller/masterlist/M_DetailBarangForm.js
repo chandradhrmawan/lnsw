@@ -3,6 +3,7 @@ const controller = {};
 const path = require('path');
 const {validationResult} = require('express-validator');
 const db = require('../../config/database/database');
+const {Op} = require('sequelize');
 
 controller.getAll = async function(req, res){
 	try{
@@ -26,9 +27,10 @@ controller.getAll = async function(req, res){
 								F.nomor_dokumen,
 								F.tgl_dokumen,
 								F.filename_dokumen,
-								F.id_permohonan,
 								F.no_seri_dokumen,
-								F.nib
+								H.ur_jenis_dokumen,
+								G.id_permohonan,
+								G.nib
 						FROM
 								masterlist.td_detail_masterlistbarang A
 						LEFT JOIN
@@ -40,7 +42,13 @@ controller.getAll = async function(req, res){
 						LEFT JOIN
 								refrensi.tr_valuta E ON A.kd_valuta = E.kd_valuta
 						LEFT JOIN
-								masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen`).then((result)=>{
+								masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen
+						LEFT JOIN
+								masterlist.td_hdr_masterlistbarang G ON A.id_barang = G.id_barang
+						LEFT JOIN
+								refrensi.tr_jenis_dokumen H on F.kd_dokumen = H.kd_dokumen
+						ORDER BY
+								A.id_detailmasterlist_barang ASC`).then((result)=>{
 									console.log(result[0].length);
 									if(result[0].length > 0){
 										res.status(200).json({
@@ -139,45 +147,61 @@ controller.getOne = async function(req, res){
 }
 
 controller.insert =  async function(req, res){
+	const t = await db.transaction();
 	try{
-		const postData = req.body;
-		const postDetailBarang = postData.detailBarang;
-		const ObjectLength = Object.keys(postData).length;
-		console.log(ObjectLength);
-		await model.M_DetailBarang.create(postDetailBarang).then((result)=>{
-			const data = result;
-			if(ObjectLength == 2){
-				const postBarangPelabuhan = postData.detailPelabuhan;
-				for(var i=0; i<postBarangPelabuhan.length; i++){
-						Object.assign(postBarangPelabuhan[i], {id_detailmasterlist_barang: result.id_detailmasterlist_barang});
-				}
-				model.M_DetailBarangPelabuhan.bulkCreate(postBarangPelabuhan).then((result)=>{
+		const errorValidation = validationResult(req);
+		if(errorValidation.isEmpty()){
+			const postData = req.body;
+			const postDetailBarang = postData.detailBarang;
+			const ObjectLength = Object.keys(postData).length;
+			console.log(ObjectLength);
+			await model.M_DetailBarang.create(postDetailBarang,{
+				transaction: t
+			}).then((result)=>{
+				const data = result;
+				if(ObjectLength == 2){
+					const postBarangPelabuhan = postData.detailPelabuhan;
+					for(var i=0; i<postBarangPelabuhan.length; i++){
+							Object.assign(postBarangPelabuhan[i], {id_detailmasterlist_barang: result.id_detailmasterlist_barang});
+					}
+					model.M_DetailBarangPelabuhan.bulkCreate(postBarangPelabuhan,{
+						transaction: t
+					}).then((result)=>{
+						t.commit();
+						res.status(200).json({
+							code: '01',
+							message: 'Sukses',
+							data: data,
+							data2: result
+						});
+					}).catch((err)=>{
+						t.rollback();
+						res.status(404).json({
+							code: '02',
+							message: err
+						});
+					});
+				}else{
+					t.commit();
 					res.status(200).json({
 						code: '01',
 						message: 'Sukses',
-						data: data,
-						data2: result
+						data: data
 					});
-				}).catch((err)=>{
-					res.status(404).json({
-						code: '02',
-						message: err
-					});
+				}
+			}).catch((err)=>{
+				t.rollback();
+				res.status(404).json({
+					code: '02',
+					message: err				
 				});
-			}else{
-				console.log('berhasil');
-				res.status(200).json({
-					code: '01',
-					message: 'Sukses',
-					data: data
-				});
-			}
-		}).catch((err)=>{
+			});
+		}else{
 			res.status(404).json({
 				code: '02',
-				message: err				
+				message: errorValidation.msg
 			});
-		});
+		}
 	}catch(err){
 		res.status(404).json({
 			code: '02',
@@ -187,46 +211,61 @@ controller.insert =  async function(req, res){
 }
 
 controller.update = async function(req, res){
+	const t = await db.transaction();
 	try{
 		const updateData = req.body;
 		const updateDetailBarang = updateData.detailBarang;
-		const updateBarangPelabuhan = updateData.detailPelabuhan;
-		// console.log(updateBarangPelabuhan[0]);
+		const ObjectLength = Object.keys(updateData).length;
 		await model.M_DetailBarang.update(updateDetailBarang,{
 			where: {
 				id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
 			}
+		},{
+			trasaction: t
 		}).then((result)=>{
-				// res.status(200).json({
-				// 	Mencoba: updateBarangPelabuhan.length
-				// });
-				console.log(updateBarangPelabuhan.length);
-				if(updateBarangPelabuhan.length > 0){
-					model.M_DetailBarangPelabuhan.update(updateBarangPelabuhan[0],{
-						where:{
-							id_detailbrg_pelabuhan: req.params.id_detailbrg_pelabuhan
+				if(ObjectLength == 2){
+					var berhasil = 0;
+					const updateBarangPelabuhan = updateData.detailPelabuhan;
+					for(var i=0 ; i<updateBarangPelabuhan.length; i++){
+						const validasi = model.M_DetailBarangPelabuhan.update(updateBarangPelabuhan[i],{
+							where:{
+								[Op.and]: [
+									{id_detailmasterlist_barang: req.params.id_detailmasterlist_barang},
+									{id_detailbrg_pelabuhan: updateBarangPelabuhan[i].id_detailbrg_pelabuhan}]
+							}
+						},{
+							trasaction: t
+						});
+
+						if(validasi){
+							berhasil++;
 						}
-					}).then((ok)=>{
+					}
+					if(berhasil == updateBarangPelabuhan.length){
+						t.commit();
 						res.status(200).json({
 							code: '01',
 							message: 'Sukses'
 						});
-					}).catch((err)=>{
-						re.status(404).json({
+					}else{
+						t.rollback();
+						res.status(404).json({
 							code: '02',
 							message: 'Tidak Berhasil'
-						})
-					});
+						});
+					}
 				}else{
+					t.commit();
 					res.status(200).json({
 						code: '01',
 						message: 'Sukses'
 					});
 				}
 		}).catch((err)=>{
+			t.rollback();
 			res.status(404).json({
 				code: '02',
-				message: err
+				message: 'Gagal'
 			})
 		}); 
 	}catch(err){
@@ -238,38 +277,39 @@ controller.update = async function(req, res){
 }
 
 controller.delete = async function(req, res){
-	await db.query(`DELETE FROM 
-							masterlist.td_detail_masterlistbarang
-					WHERE
-							id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
-								replacements: {
-									id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
-								}
-							}).then((result)=>{
-								db.query(`DELETE FROM
-												masterlist.td_detailbrg_pelabuhan
-										  WHERE
-										  		id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
-										  			replacements: {
-										  				id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
-										  			}
-										  		}).then((result)=>{
-										  			res.status(200).json({
-										  				code: '01',
-										  				message: 'Sukses'
-										  			});
-										  		}).catch((err)=>{
-										  			res.status(200).json({
-										  				code: '02',
-										  				message: err
-										  			});
-										  		});
-							}).catch((err)=>{
-								res.status(404).json({
-									code: '02',
-									message: err
-								})
-							});
+	const t = await db.transaction();
+	await model.M_DetailBarang.destroy({
+		where: {
+			id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+		}
+	},{
+		transaction: t
+	}).then((result)=>{
+		model.M_DetailBarangPelabuhan.destroy({
+			where: {
+				id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+			}
+		},{
+			transaction: t
+		}).then((result)=>{
+			t.commit();
+			res.status(200).json({
+				code: '01',
+				message: 'Sukses'
+			});
+		}).catch((err)=>{
+			t.rollback();
+			res.status(200).json({
+			code: '02',
+			message: err
+			});
+		});
+	}).catch((err)=>{
+		res.status(404).json({
+		code: '02',
+		message: err
+		})
+	});
 
 }
 
