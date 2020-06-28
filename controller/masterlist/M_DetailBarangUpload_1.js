@@ -110,12 +110,24 @@ controller.getOne = async function(req, res){
 controller.insert = async function(req, res){
 	let t = await db.transaction();
 	try{
-				const valExt = path.extname(req.file.originalname);
+		const file = req.files.file;
+		const filename = file.name;
+		const path_alamat = 'assets/upload/tamplateExcel';
+		const filedokumen = path_alamat+'/'+Date.now()+'_'+filename;
+		file.mv('./'+filedokumen, async function(err){
+			if(err){
+				res.status(404).json({
+					code: '02'
+				});
+			}else{
+				// console.log('Berhasi');
+				const modelBarangPelabuhan = [model.M_DetailBarang, model.M_DetailBrangPelabuhan];
+				const valExt = path.extname(file.name);
 				const getKdHs = [];
 				const getData = [];
 				var sama=0;
-				if(valExt == '.xlsx'){
-					const workbook = xlsx.readFile(req.file.path);
+				if(valExt == '.xlsx' || valExt == '.xls'){
+					const workbook = xlsx.readFile(filedokumen);
 					const sheet_name_list = workbook.SheetNames;
 					const getIdMasterlisBarang = [];
 					for(var i=0; i<sheet_name_list.length; i++){
@@ -165,9 +177,9 @@ controller.insert = async function(req, res){
 										Object.assign(getData, result);
 									}).catch((err)=>{
 										t.rollback();
-										const validasi = fs.existsSync(req.file.path);
+										const validasi = fs.existsSync(filedokumen);
 											if(validasi){
-												fs.unlinkSync(req.file.path);
+												fs.unlinkSync(filedokumen);
 											}
 										res.status(200).json({
 											code: '02',
@@ -189,10 +201,12 @@ controller.insert = async function(req, res){
 						message: 'File excel yang hanya diperbolehkan diupload'
 					});
 				}
+			}
+		})
 	}catch(err){
 		res.status(404).json({
 			code: '02',
-			message: 'Gagal'
+			message: err
 		});
 	}
 }

@@ -63,6 +63,7 @@ function publishExchange(exchangeName, exchangeType, routingKey, message) {
             channel.publish(exchangeName, routingKey, Buffer.from(message));
             console.log(new Date().toString() + " [x]  Sent %s", message);
         });
+        return
         setTimeout(function() {
             connection.close();
             process.exit(0);

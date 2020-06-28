@@ -19,7 +19,8 @@ controller.getAll = async function (req, res, next) {
                             ['ur_permohonan','jenis_pengajuan'],
                             ['tgl_pengajuan','tanggal_pengajuan'],
                             ['ur_proses','status_proses'],
-                            ['ur_status_perijinan','status_pengajuan']
+                            // ['ur_status_perijinan','status_pengajuan']
+                            ['ur_proses','status_pengajuan'],
                         ],
             limit: limit,
             offset:page,

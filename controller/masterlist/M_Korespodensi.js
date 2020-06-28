@@ -74,6 +74,49 @@ controller.getOne = async function (req, res) {
 		});
 	}
 }
+controller.getFind = async function (req, res) {
+	let search = req.query.nib;
+	let result = [];
+	// console.log(search);
+	try {
+		let permohonan = await model.masterList.findAll({
+			where: {
+				nib: search
+			}
+		});
+		for (const hasil of permohonan) {
+			let koresponden = await model.M_Korespodensi.findAll({
+				attributes: [
+					['id_korespodensi', 'Korespondensi'],
+					['id_permohonan', 'PermohonanId'],
+					['tipe_korespodensi', 'KorespodensiTipe'],
+					['nama_korespodensi', 'KorespodensiNama'],
+					['jbt_korespodensi', 'Jabatan'],
+					['alamat_korespodensi', 'Alamat'],
+					['jenis_identitas', 'Identitas'],
+					['nomor_identias', 'NomorIdentitas'],
+					['no_telepon', 'NoTelepon'],
+					['no_hp', 'NoHp'],
+					['email', 'Email']],
+				where: {
+					id_permohonan: hasil.id_permohonan
+				}
+			});
+			result.push(await koresponden);
+		}
+		res.status(200).json({
+			code: '01',
+			message: 'Sukses',
+			data: result
+		});
+	} catch (err) {
+		res.status(404).json({
+			code: '02',
+			message: err
+		});
+	}
+}
+// 0220201110068
 
 controller.insert = async function(req, res){
 	const t = await db.transaction();

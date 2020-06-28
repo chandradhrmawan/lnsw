@@ -4,6 +4,7 @@ const path = require('path');
 const {validationResult} = require('express-validator');
 const db = require('../../config/database/database');
 const {Op} = require('sequelize');
+const fs = require('fs');
 
 controller.getAll = async function(req, res){
 	try{
@@ -115,8 +116,11 @@ controller.getOne = async function(req, res){
 						LEFT JOIN
 							refrensi.tr_jenis_dokumen G on F.kd_dokumen = F.kd_dokumen
 						WHERE
-							A.id_barang = :id_barang`,{
+							A.id_permohonan = :id_permohonan
+						AND
+							A.id_barang = id_barang`,{
 									replacements: {
+										id_permohonan: req.params.id_permohonan,
 										id_barang: req.params.id_barang
 									}}).then((result)=>{
 											if(result[0].length > 0){
@@ -278,38 +282,64 @@ controller.update = async function(req, res){
 
 controller.delete = async function(req, res){
 	const t = await db.transaction();
-	await model.M_DetailBarang.destroy({
-		where: {
-			id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
-		}
-	},{
-		transaction: t
-	}).then((result)=>{
-		model.M_DetailBarangPelabuhan.destroy({
-			where: {
-				id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
-			}
-		},{
-			transaction: t
-		}).then((result)=>{
-			t.commit();
-			res.status(200).json({
-				code: '01',
-				message: 'Sukses'
-			});
-		}).catch((err)=>{
-			t.rollback();
-			res.status(200).json({
-			code: '02',
-			message: err
-			});
-		});
-	}).catch((err)=>{
-		res.status(404).json({
-		code: '02',
-		message: err
-		})
-	});
+	await db.query(`SELECT
+							*
+					FROM
+							masterlist.td_detail_masterlistbarang A
+					LEFT JOIN
+							masterlist.td_dokumen B ON A.id_dokumen = B.id_dokumen
+					WHERE
+							A.id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
+					  			replacements: {
+									id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+								}
+							}).then(async(result)=>{
+								const getAll = result[0][0]; 
+								if(fs.existsSync(getAll.filename_dokumen)){
+									fs.unlinkSync(getAll.filename_dokumen);
+								}
+								await model.dokumen.destroy({
+									where: {
+										id_dokumen: getAll.id_dokumen
+									}
+								},{
+									transaction: t
+								}).then(async(result)=>{
+									await model.M_DetailBarang.destroy({
+										where: {
+											id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+										}
+									},{
+										transaction: t
+									}).then(async(result)=>{
+										await model.M_DetailBarangPelabuhan.destroy({
+											where: {
+												id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
+											}
+										},{
+											transaction: t
+										}).then((result)=>{
+											t.commit();
+											res.status(200).json({
+												code: '01',
+												message: 'Sukses'
+											});
+										}).catch((err)=>{
+											t.rollback();
+											res.status(200).json({
+											code: '02',
+											message: err
+											});
+										});
+									}).catch((err)=>{
+										res.status(404).json({
+										code: '02',
+										message: err
+										})
+									});
+								});
+							});
+
 
 }
 

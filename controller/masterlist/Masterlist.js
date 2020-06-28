@@ -14,25 +14,6 @@ const fs = require('fs');
 const chmodr = require('chmodr');
 const mkdirp = require('mkdirp');
 
-// const path = require('path');
-const multer = require('multer');
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './assets/upload/Masterlist/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '_' + file.originalname);
-    }
-});
-
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype == 'application/pdf') {
-        cb(null, true);
-    } else {
-        cb(null, false);
-    }
-}
 
 controller.getAll = async function (req, res, next) {
     let data_masterlist = await model.masterList.findAll()
@@ -57,11 +38,6 @@ controller.getAll = async function (req, res, next) {
     })
 };
 
-const upload = multer({
-    storage: storage,
-    fileFilter: fileFilter,
-
-})
 
 controller.generateKode = async function (req, res, next) {
     console.log('sini');
@@ -333,6 +309,28 @@ controller.update = async function (req, res, next) {
     });
 }
 
+controller.getOneDokumen = async (req, res, next) => {
+
+    let id_dokumen = req.query.id_dokumen;
+    await model.dokumen.findOne({
+        where:{
+            id_dokumen:id_dokumen
+        }
+    }).then(result => {
+        res.status(200).json({
+            code: '01',
+            message: 'Success',
+            data:result
+        })
+    }).catch(err => {
+        res.status(400).json({
+            code: '02',
+            message: 'Error',
+            data:err
+        })
+    });
+}
+
 controller.getDokumen = async (req, res, next) => {
 
     let id_permohonan = req.query.id_permohonan;
@@ -353,6 +351,47 @@ controller.getDokumen = async (req, res, next) => {
             data:err
         })
     });
+}
+
+controller.deleteDokumen = async (req, res, next) => {
+    let transaction;
+    const id_dokumen = req.params.id_dokumen;
+    try {
+
+        let data_doc = await model.dokumen.findOne({
+            where:{id_dokumen:id_dokumen}
+        });
+        let path  = data_doc.dataValues.filename_dokumen;
+        await helpers.deleteFile(path);
+
+        await model.dokumen.destroy({
+            where: {
+                id_dokumen: id_dokumen
+            }
+        }, { transaction: transaction })
+        .then(result => {
+            res.status(200).json({
+                code: '01',
+                message: 'Dokumen Masterlist berhasil di Hapus',
+                affedted_rows:result
+             })
+        }).catch(err => {
+            res.status(400).json({
+                code: '02',
+                message: 'Error',
+                data:err
+            })
+        });
+    } catch (err) {
+        if (transaction) {
+            await transaction.rollback()
+            res.status(400).json({
+                'status': 'ERROR',
+                'messages': err.message
+            })
+        }
+
+    }
 }
 
 controller.uploadDokumen = async (req,res,next) => {
@@ -380,12 +419,12 @@ controller.uploadDokumen = async (req,res,next) => {
             nib              : data_upload.nib
         }
 
-        await model.dokumen.create(post_data)
+        let resp = await model.dokumen.create(post_data)
 
         res.status(200).json({
             code: '01',
             message: 'Success',
-            data:post_data
+            data:resp
         })
     }catch(err){
          res.status(400).json({

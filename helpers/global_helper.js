@@ -130,4 +130,32 @@ helpers.uploadData = async (param) => {
 
 }
 
+helpers.deleteFile = async (full_path) => { 
+
+	fs.access(full_path, fs.F_OK, (err) => {
+		if (err) {
+			// file not exsist
+			console.error(err)
+		}else{
+
+			//give privilege to remove file
+		    chmodr(full_path, 0o777, (err) => {
+		      if (err) console.log(err);
+		    });
+
+			// do remove file
+			fs.unlink(full_path, (err) => {
+				if(err)console.log(err);
+			});
+
+			//close privilege
+		    chmodr(full_path, 0o544, (err) => {
+		      if (err) console.log(err);
+		    });
+		}
+		return
+	})
+
+}
+
 module.exports = helpers;

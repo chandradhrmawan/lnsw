@@ -11,6 +11,7 @@ router.get('/:id_korespodensi',
 		.trim()
 		.escape()],
 	controller.M_Korespodensi.getOne);
+router.get('/search/nib', controller.M_Korespodensi.getFind);
 router.post('/korespodensi', [check('id_permohonan').isLength({ max: 17 })
 	.blacklist('~!@#$%^&*()_+=<>{}?/":')
 	.trim()
