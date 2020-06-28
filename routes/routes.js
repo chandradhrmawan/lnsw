@@ -13,6 +13,7 @@ const jenisDokumenRouter = require('./refrensi/jenis_dokumen');
 const jenisPermohonanRouter = require('./refrensi/jenis_permohonan');
 const valutaRouter = require('./refrensi/valuta');
 const kursRouter = require('./refrensi/kurs');
+const layanan = require('./refrensi/layanan');
 const autocomplete = require('./autocollection');
 const documentLayanan = require('./documentLayanan/documentLayanan');
 // const globalRoute = require('./global/web');
@@ -86,5 +87,6 @@ module.exports = {
     beritaRouter: beritaRouter,
     jenisBarang: jenisBarang,
     log: log,
-    kek: kek
+    kek: kek,
+    layanan:layanan
 }

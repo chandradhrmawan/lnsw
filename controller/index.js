@@ -31,6 +31,7 @@ const valuta = require('./refrensi/Valuta');
 const daerah = require('./refrensi/Daerah');
 const listHs = require('./refrensi/ListHscode');
 const kurs = require('./refrensi/Kurs');
+const layanan = require('./refrensi/layanan');
 const menu = require('./acl/menu');
 const login = require('./acl/login');
 const pg = require('./pg/pg');
@@ -75,6 +76,7 @@ controller.listHs = listHs;
 controller.kurs = kurs;
 controller.jenisBarang = jenisBarang;
 controller.kek = kek;
+controller.layanan = layanan;
 // END CONTROLLER REFRENSI
 
 // CONTROLLER BERITA
