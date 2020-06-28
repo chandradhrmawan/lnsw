@@ -10,29 +10,58 @@ const {validationResult} = require('express-validator');
 const converter = require('hex2dec');
 const stripHexPrefix = require('strip-hex-prefix');
 const helpers    = require('../../helpers/global_helper');
+const fs = require('fs');
+const chmodr = require('chmodr');
+const mkdirp = require('mkdirp');
+
+// const path = require('path');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './assets/upload/Masterlist/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '_' + file.originalname);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype == 'application/pdf') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
 
 controller.getAll = async function (req, res, next) {
     let data_masterlist = await model.masterList.findAll()
-        .then((result) => {
-            if (result.length > 0) {
-                res.status(200).json({
-                    code: '01',
-                    message: 'Sukses',
-                    data: result
-                });
-            } else {
-                res.status(404).json({
-                    code: '01',
-                    message: 'Tidak Ada Data'
-                });
-            }
-        }).catch((err) => {
-            res.status(400).json({
-                code: '02',
-                message: err
+    .then((result) => {
+        if (result.length > 0) {
+            res.status(200).json({
+                code: '01',
+                message: 'Sukses',
+                data: result
             });
-        })
+        } else {
+            res.status(404).json({
+                code: '01',
+                message: 'Tidak Ada Data'
+            });
+        }
+    }).catch((err) => {
+        res.status(400).json({
+            code: '02',
+            message: err
+        });
+    })
 };
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+
+})
 
 controller.generateKode = async function (req, res, next) {
     console.log('sini');
@@ -112,6 +141,7 @@ controller.post = async function (req, res) {
             nama_perusahaan       : req.body.nama_perusahaan_pu,
             nama_penanggung_jawab : req.body.nama_pu,
             email                 : req.body.email_pu,
+            kd_jenis_permohonan   : 8,
             kd_proses             : 1
         }
 
@@ -302,6 +332,72 @@ controller.update = async function (req, res, next) {
         })
     });
 }
+
+controller.getDokumen = async (req, res, next) => {
+
+    let id_permohonan = req.query.id_permohonan;
+    await model.dokumen.findAll({
+        where:{
+            id_permohonan:id_permohonan
+        }
+    }).then(result => {
+        res.status(200).json({
+            code: '01',
+            message: 'Success',
+            data:result
+        })
+    }).catch(err => {
+        res.status(400).json({
+            code: '02',
+            message: 'Error',
+            data:err
+        })
+    });
+}
+
+controller.uploadDokumen = async (req,res,next) => {
+
+    try{
+    
+        if (!req.files || Object.keys(req.files).length === 0) {
+            res.status(400).json({code: '02',message: 'No File Selected'});
+        }
+        
+        let upload_param = {
+            id_permohonan   : req.body.id_permohonan,
+            file_upload     : req.files.dokumen
+        }
+
+        let data_upload = await helpers.uploadData(upload_param);
+        
+        let post_data = {
+            kd_dokumen       : req.body.kd_dokumen,
+            nomor_dokumen    : req.body.nomor_dokumen,
+            tgl_dokumen      : Date.now(),
+            filename_dokumen : data_upload.path,
+            id_permohonan    : req.body.id_permohonan,
+            no_seri_dokumen  : req.body.no_seri_dokumen,
+            nib              : data_upload.nib
+        }
+
+        await model.dokumen.create(post_data)
+
+        res.status(200).json({
+            code: '01',
+            message: 'Success',
+            data:post_data
+        })
+    }catch(err){
+         res.status(400).json({
+            code: '02',
+            message: 'Error',
+            data:err
+        })
+    }   
+
+}
+
+
 
 controller.hex = async function (req, res, next) {
     //Contoh pemanggilan Generate

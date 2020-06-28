@@ -43,6 +43,10 @@ const kek = require('./refrensi/Kek');
 const berita = require('./berita/Berita');
 // END CONTROLLER BERITA
 
+// CONTROLLER ELASTICSEARCH
+const es_hscode = require('./elasticsearch/Hscode');
+// END CONTROLLER ELASTICSEARCH
+
 const controller = {};
 
 // controller.sendEmail = sendEmail;
@@ -75,6 +79,10 @@ controller.kek = kek;
 // CONTROLLER BERITA
 controller.berita = berita;
 // END CONTROLLER BERITA
+
+// CONTROLLER ELASTICSEARCH
+controller.es_hscode = es_hscode;
+// END CONTROLLER ELASTICSEARCH
 
 //CONTROLLER ACL
 controller.menu = menu;

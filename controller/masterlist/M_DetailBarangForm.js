@@ -68,31 +68,49 @@ controller.getAll = async function(req, res){
 controller.getOne = async function(req, res){
 	try{
 		await db.query(`SELECT
+							DISTINCT
 								A.*,
-								B.*
+								B.id_hscode,
+								B.hd_code_format,
+								B.id_takik,
+								B.uraian_id,
+								B.uraian_en,
+								B.bm_mfn,
+								B.no_skep,
+								B.tanggal_skep,
+								B.berlaku AS berlaku_hscode,
+								b.fl_use,
+								b.create_dt,
+								C.ur_satuan,
+								D.ur_incoterm,
+								E.ur_valuta,
+								F.kd_dokumen,
+								F.nomor_dokumen,
+								F.tgl_dokumen,
+								F.filename_dokumen,
+								F.id_permohonan,
+								F.no_seri_dokumen,
+								F.nib,
+								G.ur_jenis_dokumen
 						FROM
-								masterlist.v_masterlist_detail A
+							masterlist.td_detail_masterlistbarang A
 						LEFT JOIN
-								masterlist.td_detailbrg_pelabuhan B
-						ON
-								A.id_detailmasterlist_barang = B.id_detailmasterlist_barang
+							refrensi.tr_hscode B ON A.kd_hs = B.kd_hs
 						LEFT JOIN
-								refrensi.tr_negara C
-						ON
-								B.kd_negara = C.kd_negara
+							refrensi.tr_satuan C ON A.kd_satuan = C.kd_satuan
 						LEFT JOIN
-								refrensi.tr_pelabuhan D
-						ON
-								B.kd_pelabuhan = D.kd_pelabuhan
+							refrensi.tr_incoterm D ON A.incoterm = D.incoterm
+						LEFT JOIN
+							refrensi.tr_valuta E ON A.kd_valuta = E.kd_valuta
+						LEFT JOIN
+							masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen
+						LEFT JOIN
+							refrensi.tr_jenis_dokumen G on F.kd_dokumen = F.kd_dokumen
 						WHERE
-								id_permohonan= :id_permohonan
-						AND
-								id_barang= :id_barang`,{
+							A.id_barang = :id_barang`,{
 									replacements: {
-										id_permohonan: req.params.id_permohonan,
 										id_barang: req.params.id_barang
 									}}).then((result)=>{
-										console.log(result.rowCount);
 											if(result[0].length > 0){
 												res.status(200).json({
 													code: '01',

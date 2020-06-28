@@ -32,8 +32,8 @@ var masterList = db.define('td_masterlist',
         kd_status_perijinan: Sequelize.STRING,
         tujuan_kegiatan: Sequelize.STRING,
         id_wilayah_kerja: Sequelize.BIGINT,
-        kd_proses: Sequelize.STRING
-
+        kd_proses: Sequelize.STRING,
+        kd_layanan: Sequelize.BIGINT,
     }, {
     schema: 'masterlist',
     freezeTableName: true,

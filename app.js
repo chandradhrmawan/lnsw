@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const fileUpload = require('express-fileupload');
 
 const db = require('./config/database/mysql');
 const cors = require('cors');
@@ -14,6 +15,7 @@ const app = express();
 const route = express.Router();
 app.use(helmet());
 app.use(cors());
+app.use(fileUpload());
 
 
 app.use(require('sanitize').middleware);
@@ -52,6 +54,10 @@ app.use('/api/kek', link.kek);
 // ROUTER BERITA
 app.use('/api/berita', link.beritaRouter);
 // END ROUTER BERITA
+
+// ROUTER ELASTICSEARCH
+app.use('/api/hscode_mobile', link.esHscodeRouter);
+// END ROUTER ELASTICSEARCH
 
 // app.use('/api', link.refrensiRouter);
 

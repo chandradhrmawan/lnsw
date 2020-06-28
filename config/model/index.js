@@ -42,6 +42,7 @@ const daerah = require('./refrensi/tr_daerah_model');
 const list_hscode = require('./refrensi/tr_listhscode_kek');
 const kurs = require('./refrensi/tr_kurs_model');
 const jenisBarang = require('./refrensi/jenisBarang');
+const layanan = require('./refrensi/layanan');
 // END MODEL REFRENSI
 
 // MODEL BERITA
@@ -98,6 +99,7 @@ model.daerah = daerah;
 model.list_hscode = list_hscode;
 model.kurs = kurs;
 model.jenisBarang = jenisBarang;
+model.layanan = layanan;
 //END MODEL REFRENSI
 
 // MODEL BERITA

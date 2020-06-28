@@ -112,6 +112,7 @@ controller.insert =  async function(req, res){
 		const modelBarangPelabuhan = [model.M_DetailBarang, model.M_DetailBrangPelabuhan];
 		const valExt = path.extname(req.file.filename);
 		const getKdHs = [];
+		const getData = [];
 		if(valExt == '.xlsx' || valExt == '.xls'){
 			const workbook = xlsx.readFile(req.file.path);
 			const sheet_name_list = workbook.SheetNames;
@@ -124,9 +125,10 @@ controller.insert =  async function(req, res){
 						Object.assign(xlData[j], {id_detailmasterlist_barang: getIdMasterlisBarang[j]} );
 					}
 					await model.M_DetailBarangPelabuhan.bulkCreate(xlData).then((result)=>{
+						console.log(getData);
 						res.status(200).json({
 							code: '01',
-							message: xlData[0]
+							message: getData
 						})
 					}).catch((err)=>{
 						res.status(404).json({
@@ -141,7 +143,9 @@ controller.insert =  async function(req, res){
 						getKdHs[j] = xlData[j].kd_hs;
 					}
 						const validasi = await model.M_DetailBarang.bulkCreate(xlData);
+						Object.assign(getData, validasi);
 						if(validasi){
+							// Object.assign(getData, validasi[0].dataValues);
 							console.log(getKdHs);
 								const [results, metadata] = await db.query(`SELECT 
 																				A.id_detailmasterlist_barang
@@ -159,10 +163,11 @@ controller.insert =  async function(req, res){
 								for(var j=0; j<results.length; j++){
 									getIdMasterlisBarang[j] = results[j].id_detailmasterlist_barang;
 								}
-								console.log(getIdMasterlisBarang);
-								// console.log(getIdMasterlisBarang[j]);
 						}else{
-							console.log('Gagal');
+							res.status(200).json({
+								code: '02',
+								message: 'Gagal'
+							});
 						}
 				}
 			}

@@ -34,5 +34,4 @@ const masterDokumen = db.define('td_dokumen', {
 	timestamps: false
 });
 
-masterDokumen.removeAttribute('id');
 module.exports = masterDokumen;
