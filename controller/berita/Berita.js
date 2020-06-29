@@ -86,7 +86,7 @@ controller.getAll = async function (req, res) {
 
 controller.getDetail = async function (req, res) {
     // console.log(req.params);
-    const id = req.params.id;
+    const id = req.query.id;
     await model.berita.findAll({
         attributes: [['id_berita', 'id_berita'], ['wk_rekam', 'wk_rekam']],
         include: [
