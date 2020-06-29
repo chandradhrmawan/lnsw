@@ -1,3 +1,4 @@
+require('dotenv').config();
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -7,15 +8,60 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 // const fileUpload = require('express-fileupload');
 
+const debug = require('debug')('lnsw:server');
+
+const http = require('http');
+
 const db = require('./config/database/mysql');
 const cors = require('cors');
 
 const link = require('./routes/routes');
 const app = express();
+
+const socket = require( 'socket.io' );
+
 const route = express.Router();
 app.use(helmet());
 app.use(cors());
 // app.use(fileUpload());
+
+var port = normalizePort(process.env.PORT || '3000');
+// app.set('port', port);
+var server = http.createServer(app);
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+
+
+const io = socket.listen( server );
+let mdl = require('./config/model/index');
+
+app.get('/api/logs', async function (req, res, next) {
+  
+    io.on("connection", (socket) => {
+      console.log("New client connected");
+      if (interval) {
+        clearInterval(interval);
+      }
+      interval = setInterval(() => getData(socket), 1000);
+      socket.on("disconnect", () => {
+        console.log("Client disconnected");
+        clearInterval(interval);
+      });
+    });
+
+})
+
+
+const getData = async (socket) => {
+  await model.v_log.findAll()
+    .then((result) => {
+        socket.emit("FromAPI", result);
+     });
+}
+
 
 
 app.use(require('sanitize').middleware);
@@ -124,5 +170,53 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
 
 module.exports = app;

@@ -39,6 +39,7 @@
     "read-excel-file": "^4.0.6",
     "sanitize": "^2.1.0",
     "sequelize": "^5.21.12",
+    "socket.io": "^2.3.0",
     "strip-hex-prefix": "^1.0.0",
     "xlsx": "^0.16.2"
   }
