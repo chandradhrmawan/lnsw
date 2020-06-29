@@ -213,7 +213,8 @@ controller.getAll = async function (req, res) {
             } else {
                 res.status(200).json({
                     code: '01',
-                    message: 'Tidak Ada Data'
+                    message: 'Tidak Ada Data',
+                    data: {},
                 })
             }
         }).catch((err) => {
