@@ -4,18 +4,6 @@ const controller = {};
 const path = require('path');
 const moment = require('moment');
 const { validationResult } = require('express-validator');
-const socket = require( 'socket.io' );
-
-controller.test = async function (req, res) {
-    await model.v_log.findAll()
-    .then((result) => {
-      res.status(200).json({
-            code: '01',
-            message: 'Sukses',
-            data: result
-    });
-   });
-}
 
 controller.getAll = async function (req, res) {
 

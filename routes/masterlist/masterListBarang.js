@@ -6,28 +6,28 @@ const { check, validationResult } = require('express-validator');
 const model = require('../../config/model/index');
 const controller = require('../../controller/index');
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './assets/upload/MasterlistBarang/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '_' + file.originalname);
-    }
-});
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, './assets/upload/MasterlistBarang/');
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, Date.now() + '_' + file.originalname);
+//     }
+// });
 
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype == 'application/pdf') {
-        cb(null, true);
-    } else {
-        cb(null, false);
-    }
-}
+// const fileFilter = (req, file, cb) => {
+//     if (file.mimetype == 'application/pdf') {
+//         cb(null, true);
+//     } else {
+//         cb(null, false);
+//     }
+// }
 
-const upload = multer({
-    storage: storage,
-    fileFilter: fileFilter,
+// const upload = multer({
+//     storage: storage,
+//     fileFilter: fileFilter,
 
-})
+// })
 //postDataMasterlist Barang
 router.post('/', [check('JenisBarang')
     .isLength({ max: 45 })
@@ -116,11 +116,11 @@ router.post('/FormData',
     check('Nib')
         .isLength({ max: 26 })
         .trim()
-        .escape()], upload.single('path'), function (req, res) {
+        .escape()], function (req, res) {
             controller.masterListBarang.postData(req, res)
         });
 //postDokumen
-router.post('/dokumen', upload.single('path'), function (req, res) {
+router.post('/dokumen', function (req, res) {
     controller.masterListBarang.upload(req, res)
 });
 //getAll

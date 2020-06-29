@@ -2,6 +2,7 @@ const model = require('../../config/model/index');
 const { Op } = require('sequelize');
 const moment = require('moment');
 const controller = {};
+const helpers = require('../../helpers/global_helper');
 const path = require('path');
 const db = require('../../config/database/database');
 const BarangModel = require('../../config/model/masterlist/MasterlistBarang');
@@ -52,7 +53,16 @@ controller.upload = async function (req, res) {
 controller.postData = async function (req, res) {
     let transaction;
     let now = moment();
-    console.log(BarangInvoice());
+    if (!req.files || Object.keys(req.files).length === 0) {
+        res.status(400).json({ code: '02', message: 'No File Selected' });
+    }
+
+    let upload_param = {
+        id_permohonan: req.body.PermohonanId,
+        file_upload: req.files.path
+    }
+
+    let data_upload = await helpers.uploadData(upload_param);
     try {
         transaction = await db.transaction();
         const newDocument = await model.dokumen.create({
@@ -60,7 +70,7 @@ controller.postData = async function (req, res) {
             nomor_dokumen: req.body.NoDokumen,
             tgl_dokumen: Date.now(),
             id_permohonan: req.body.PermohonanId,
-            filename_dokumen: req.file.path,
+            filename_dokumen: data_upload.path,
             no_seri_dokumen: req.body.NoSeriPermohonan,
             nib: req.body.Nib
         }, { transaction: transaction })
@@ -127,6 +137,18 @@ controller.deleteBarang = async function (req, res) {
                 }
             }, { transaction: transaction });
         });
+        let data_doc = await model.masterListBarang.findOne({
+            where: { id_barang: BarangId }
+        });
+        let id_dokumen = data_doc.dataValues.id_dokumen;
+        let path = data_doc.dataValues.doc_name;
+        await helpers.deleteFile(path);
+
+        await model.dokumen.destroy({
+            where: {
+                id_dokumen: id_dokumen
+            }
+        }, { transaction: transaction })
         await model.masterListBarang.destroy({
             where: {
                 id_barang: BarangId

@@ -138,7 +138,7 @@ controller.getOne = async function(req, res){
 											}else{
 												res.status(200).json({
 													code: '01',
-													message: 'Sukses',
+													message: 'Tidak ada data',
 													data: []
 												});
 											}
@@ -266,7 +266,7 @@ controller.update = async function(req, res){
 						t.rollback();
 						res.status(404).json({
 							code: '02',
-							message: 'Tidak Berhasil Menambah Data',
+							message: 'Tidak Berhasil Merubah Data',
 							data: []
 						});
 					}
@@ -342,7 +342,7 @@ controller.delete = async function(req, res){
 											t.rollback();
 											res.status(200).json({
 											code: '02',
-											message: 'Tik dapat Menghapu data',
+											message: 'Tik dapat Menghapus data',
 											data: []
 											});
 										});
