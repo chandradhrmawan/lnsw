@@ -101,7 +101,7 @@ helpers.uploadData = async (param) => {
     //check folder exsist or not
     if (!fs.existsSync(path_upload)){
         fs.mkdir(path_upload, { recursive: true }, (err) => {
-            if(err)res.status(400).json({code: '02',message: err});
+         	if (err) console.log(err);
         });
     }
 
@@ -116,7 +116,7 @@ helpers.uploadData = async (param) => {
 
     //do upload file
     upload_file.mv(full_path, (err) => {
-        if (err) res.status(400).json({code: '02',message: err});
+         if (err) console.log(err);
     });
 
     //close privilege to read only
