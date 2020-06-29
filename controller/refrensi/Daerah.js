@@ -69,7 +69,7 @@ controller.findDaerah = async function (req, res) {
 	});
 }
 controller.findbyNib = async function (req, res) {
-	let search = req.query.nib;
+	let search = req.query.perseroan;
 	let result = [];
 	let prov = search.substring(0, 2);
 	let kota = search.substring(0, 4);
@@ -135,7 +135,7 @@ controller.findbyNib = async function (req, res) {
 	}
 }
 controller.findProvinsi = async function (req, res) {
-	let search = req.query.nib;
+	let search = req.query.perseroan;
 	let prov = search.substring(0, 2);
 	try {
 		const provinsi = await model.daerah.findAll({

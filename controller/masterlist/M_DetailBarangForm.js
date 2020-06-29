@@ -139,19 +139,21 @@ controller.getOne = async function(req, res){
 												res.status(200).json({
 													code: '01',
 													message: 'Sukses',
-													data: 'Tidak ada data'
+													data: []
 												});
 											}
 									}).catch((err)=>{
 										res.status(404).json({
 											code: '02',
-											message: err
+											message: 'Tidak dapat menampilkan data',
+											data: []
 										})
 									});
 	}catch(err){
 		res.status(200).json({
 			code: '02',
-			message: err
+			message: 'Terjadi Kesalahan',
+			data: []
 		})
 	}
 }
@@ -188,7 +190,8 @@ controller.insert =  async function(req, res){
 						t.rollback();
 						res.status(404).json({
 							code: '02',
-							message: err
+							message: 'Tidak Ada Data',
+							data: []
 						});
 					});
 				}else{
@@ -196,14 +199,15 @@ controller.insert =  async function(req, res){
 					res.status(200).json({
 						code: '01',
 						message: 'Sukses',
-						data: data
+						data: []
 					});
 				}
 			}).catch((err)=>{
 				t.rollback();
 				res.status(404).json({
 					code: '02',
-					message: err				
+					message: 'Tidak Berhasil Menambah Data',
+					data: []				
 				});
 			});
 		}else{
@@ -215,7 +219,8 @@ controller.insert =  async function(req, res){
 	}catch(err){
 		res.status(404).json({
 			code: '02',
-			message: err
+			message: 'Terjadi Kesalahan',
+			data: []
 		});
 	}
 }
@@ -261,7 +266,8 @@ controller.update = async function(req, res){
 						t.rollback();
 						res.status(404).json({
 							code: '02',
-							message: 'Tidak Berhasil'
+							message: 'Tidak Berhasil Menambah Data',
+							data: []
 						});
 					}
 				}else{
@@ -275,13 +281,15 @@ controller.update = async function(req, res){
 			t.rollback();
 			res.status(404).json({
 				code: '02',
-				message: 'Gagal'
+				message: 'Gagal',
+				data: []
 			})
 		}); 
 	}catch(err){
 		res.status(404).json({
 			status: '02',
-			message: err
+			message: 'Terjadi Kesalahan',
+			data: []
 		});
 	}
 }
@@ -304,13 +312,13 @@ controller.delete = async function(req, res){
 								if(fs.existsSync(getAll.filename_dokumen)){
 									fs.unlinkSync(getAll.filename_dokumen);
 								}
-								// await model.dokumen.destroy({
-								// 	where: {
-								// 		id_dokumen: getAll.id_dokumen
-								// 	}
-								// },{
-								// 	transaction: t
-								// }).then(async(result)=>{
+								await model.dokumen.destroy({
+									where: {
+										id_dokumen: getAll.id_dokumen
+									}
+								},{
+									transaction: t
+								}).then(async(result)=>{
 									await model.M_DetailBarang.destroy({
 										where: {
 											id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
@@ -334,17 +342,19 @@ controller.delete = async function(req, res){
 											t.rollback();
 											res.status(200).json({
 											code: '02',
-											message: err
+											message: 'Tik dapat Menghapu data',
+											data: []
 											});
 										});
 									}).catch((err)=>{
 										res.status(404).json({
 										code: '02',
-										message: err
+										message: 'Tidak dapat menghapus data dokumen',
+										data: []
 										})
 									});
 								});
-							// });
+							});
 
 
 }

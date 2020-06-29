@@ -43,6 +43,7 @@ const beritaRouter = require('./berita/berita');
 const jenisBarang = require('./refrensi/jenisBarang');
 const log = require('./log/log');
 const kek = require('./refrensi/kek');
+const statusProses = require('./refrensi/statusProses');
 
 module.exports = {
     satuanRouter: satuanRouter,
@@ -88,5 +89,6 @@ module.exports = {
     jenisBarang: jenisBarang,
     log: log,
     kek: kek,
-    layanan:layanan
+    layanan:layanan,
+    statusProses:statusProses
 }

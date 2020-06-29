@@ -43,6 +43,7 @@ const list_hscode = require('./refrensi/tr_listhscode_kek');
 const kurs = require('./refrensi/tr_kurs_model');
 const jenisBarang = require('./refrensi/jenisBarang');
 const layanan = require('./refrensi/layanan');
+const statusProses = require('./refrensi/status_proses');
 // END MODEL REFRENSI
 
 // MODEL BERITA
@@ -100,6 +101,7 @@ model.list_hscode = list_hscode;
 model.kurs = kurs;
 model.jenisBarang = jenisBarang;
 model.layanan = layanan;
+model.statusProses = statusProses;
 //END MODEL REFRENSI
 
 // MODEL BERITA

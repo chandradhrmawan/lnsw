@@ -4,8 +4,8 @@ const controller = require('../../controller/index');
 
 router.get('/', controller.daerah.getAll);
 router.get('/:search', controller.daerah.findDaerah);
-router.get('/search/nib', controller.daerah.findbyNib);
-router.get('/searchby/nib', controller.daerah.findProvinsi);
+router.get('/search/perseroan', controller.daerah.findbyNib);
+router.get('/searchby/perseroan', controller.daerah.findProvinsi);
 router.get('/searchby/prov', controller.daerah.findKota);
 router.get('/searchby/kota', controller.daerah.findKecamatan);
 router.get('/searchby/kec', controller.daerah.findKelurahan);
