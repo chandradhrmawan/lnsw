@@ -4,6 +4,7 @@ const controller = {};
 const path = require('path');
 const moment = require('moment');
 const {validationResult} = require('express-validator');
+const db = require('../../config/database/database');
 
 controller.getAll = async function (req, res) {
     const today = moment(Date.now());
@@ -11,7 +12,7 @@ controller.getAll = async function (req, res) {
     const rabu = moment().startOf('isoweek').add(2, 'days');
     const weekend = moment().endOf('isoweek');
     const selasa = moment().endOf('isoweek').add(2, 'days');
-    console.log(today, rabu, selasa);
+    console.log(weekstart, rabu, weekend, selasa);
     await model.kurs.findAll({
         attributes: [
             ['kd_kurs', 'kdKurs'],
@@ -48,43 +49,72 @@ controller.getAll = async function (req, res) {
         })
 };
 
-controller.get = async function (req, res, next) {
-    const search = req.params.search;
-    await model.kurs.findAll({
-        attributes: [
-            ['kd_kurs', 'kdKurs'],
-            ['tgawal', 'tanggalAwal'],
-            ['tgakhir', 'tanggalAkhir'],
-            ['nilai', 'nilai'],
-            ['ket', 'keterangan'],
-            ['create_dt', 'create_date']
-        ],
-        where: {
-            [Op.or]: [{
-                kd_kurs: {
-                    [Op.iLike]: '%' + search + '%'
-                }
-            }]
-        }
-    }).then((result) => {
-        if (result.length > 0) {
-            res.status(200).json({
-                code: '01',
-                message: 'Sukses',
-                data: result
-            });
-        } else {
-            res.status(404).json({
-                code: '01',
-                message: 'Tidak Ada Data'
-            });
-        }
-    }).catch((err) => {
-        res.status(400).json({
-            code: '02',
-            message: err
-        })
-    });
+controller.get = async function (req, res) {
+    const date = req.query.date;
+    // const json = JSON.stringify(date);
+    // const newdate = JSON.parse(json);
+    // const date = "'2020-06-29 00:00:00.000 +00:00'";
+    // console.log(json, newdate);
+
+    try{
+        await db.query(`SELECT "kd_kurs" AS "kdKurs", "tgawal" AS "tanggalAwal", "tgakhir" AS "tanggalAkhir", "nilai" AS "nilai", "ket" AS "keterangan", "create_dt" AS "create_date" FROM "refrensi"."tr_kurs" AS "tr_kurs" WHERE '`+date+`' BETWEEN "tr_kurs"."tgawal" AND "tr_kurs"."tgakhir"`)
+        .then((result)=>{
+            // console.log(result[0].length);
+            if(result[0].length > 0){
+                res.status(200).json({
+                    code: '01',
+                    message: 'Sukses',
+                    data: result[0]
+                });
+            }else{
+                res.status(200).json({
+                    code: '02',
+                    message: 'Sukses',
+                    data: 'Tidak ada Data'
+                });
+            }
+        });
+    }catch(err){
+		res.status(200).json({
+			code: '02',
+			message: err
+		});
+	}
+
+    // await model.kurs.findAll({
+    //     attributes: [
+    //         ['kd_kurs', 'kdKurs'],
+    //         ['tgawal', 'tanggalAwal'],
+    //         ['tgakhir', 'tanggalAkhir'],
+    //         ['nilai', 'nilai'],
+    //         ['ket', 'keterangan'],
+    //         ['create_dt', 'create_date']
+    //     ],
+    //     where: {
+    //         tgawal: {
+    //             [Op.gte]: date,
+    //         }
+    //     }
+    // })
+    // .then((result) => {
+    //     if (result.length > 0) {
+    //         res.status(200).json({
+    //             code: '01',
+    //             message: 'Sukses',
+    //             data: result
+    //         });
+    //     } else {
+    //         res.status(404).json({
+    //             code: '01',
+    //             message: 'Tidak Ada Data'
+    //         });
+    //     }
+    // }).catch((err) => {
+    //     res.status(400).json({
+    //         code: '02',
+    //         message: err
+    //     })
+    // });
 };
 
 controller.post = async function (req, res) {

@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const db = require('../../database/database');
 const masterlistBarang = require('./MasterlistBarang');
+const korespodensi = require('./M_Korespondensi');
 
 var masterList = db.define('td_masterlist',
     {
@@ -19,7 +20,7 @@ var masterList = db.define('td_masterlist',
         alamat_perusahaan: Sequelize.STRING,
         rt_rw_perusahaan: Sequelize.STRING,
         kelurahan: Sequelize.STRING,
-        kd_kota: Sequelize.BIGINT,
+        kd_daerah: Sequelize.BIGINT,
         kd_pos: Sequelize.STRING,
         no_telepon: Sequelize.STRING,
         no_fax: Sequelize.STRING,
@@ -28,7 +29,7 @@ var masterList = db.define('td_masterlist',
         jbt_penangungjawab: Sequelize.STRING,
         kd_kek: Sequelize.BIGINT,
         kd_kppbc: Sequelize.STRING,
-        kd_kota_pengajuan: Sequelize.BIGINT,
+        kd_daerah_pengajuan: Sequelize.BIGINT,
         kd_status_perijinan: Sequelize.STRING,
         tujuan_kegiatan: Sequelize.STRING,
         id_wilayah_kerja: Sequelize.BIGINT,
@@ -40,5 +41,12 @@ var masterList = db.define('td_masterlist',
     timestamps: false
 }
 );
+
+masterList.hasMany(korespodensi, {
+    // as: 'td_korespodensis',
+    foreignKey: 'id_permohonan'
+
+});
+korespodensi.belongsTo(masterList, { foreignKey: 'id_permohonan' });
 
 module.exports = masterList;

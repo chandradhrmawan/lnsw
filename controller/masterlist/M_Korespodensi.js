@@ -76,38 +76,16 @@ controller.getOne = async function (req, res) {
 }
 controller.getFind = async function (req, res) {
 	let search = req.query.nib;
-	let result = [];
-	// console.log(search);
 	try {
-		let permohonan = await model.masterList.findAll({
+		let koresponden = await model.v_korespodensi.findAll({
 			where: {
 				nib: search
-			}
+			},
 		});
-		for (const hasil of permohonan) {
-			let koresponden = await model.M_Korespodensi.findAll({
-				attributes: [
-					['id_korespodensi', 'Korespondensi'],
-					['id_permohonan', 'PermohonanId'],
-					['tipe_korespodensi', 'KorespodensiTipe'],
-					['nama_korespodensi', 'KorespodensiNama'],
-					['jbt_korespodensi', 'Jabatan'],
-					['alamat_korespodensi', 'Alamat'],
-					['jenis_identitas', 'Identitas'],
-					['nomor_identias', 'NomorIdentitas'],
-					['no_telepon', 'NoTelepon'],
-					['no_hp', 'NoHp'],
-					['email', 'Email']],
-				where: {
-					id_permohonan: hasil.id_permohonan
-				}
-			});
-			result.push(await koresponden);
-		}
 		res.status(200).json({
 			code: '01',
 			message: 'Sukses',
-			data: result
+			data: koresponden
 		});
 	} catch (err) {
 		res.status(404).json({
@@ -116,11 +94,10 @@ controller.getFind = async function (req, res) {
 		});
 	}
 }
-// 0220201110068
 
-controller.insert = async function(req, res){
+controller.insert = async function (req, res) {
 	const t = await db.transaction();
-	try{
+	try {
 		const errInput = validationResult(req);
 		if (errInput.isEmpty()) {
 			await model.M_Korespodensi.create({
@@ -134,7 +111,7 @@ controller.insert = async function(req, res){
 				no_telepon: req.body.no_telepon,
 				np_hp: req.body.np_hp,
 				email: req.body.email,
-			},{
+			}, {
 				transaction: t
 			}).then((result) => {
 				t.commit();
@@ -163,9 +140,9 @@ controller.insert = async function(req, res){
 	}
 }
 
-controller.update = async function(req, res){
+controller.update = async function (req, res) {
 	const t = await db.transaction();
-	try{
+	try {
 		const errInput = validationResult(req);
 		if (errInput.isEmpty()) {
 			await model.M_Korespodensi.update({
@@ -183,7 +160,7 @@ controller.update = async function(req, res){
 				where: {
 					id_korespodensi: req.params.id_korespodensi
 				}
-			},{
+			}, {
 				transaction: t
 			}).then((result) => {
 				t.commit();
@@ -211,31 +188,31 @@ controller.update = async function(req, res){
 		});
 	}
 }
-controller.delete = async function(req, res){
+controller.delete = async function (req, res) {
 	const t = await db.transaction();
-	try{
+	try {
 		const errInput = validationResult(req);
-			if(errInput.isEmpty()){
-				await model.M_Korespodensi.destroy({
-					where: {
-						id_korespodensi: req.params.id_korespodensi
-					}
-				},{
-					transaction: t
-				}).then((result)=>{
-					t.commit();
-					res.status(200).json({
-						code: '01',
-						message: 'Sukes'
-					})
-				}).catch((err)=>{
-					t.rollback();
-					res.status(404).json({
-						code: '02',
-						message: err
-					});
+		if (errInput.isEmpty()) {
+			await model.M_Korespodensi.destroy({
+				where: {
+					id_korespodensi: req.params.id_korespodensi
+				}
+			}, {
+				transaction: t
+			}).then((result) => {
+				t.commit();
+				res.status(200).json({
+					code: '01',
+					message: 'Sukes'
+				})
+			}).catch((err) => {
+				t.rollback();
+				res.status(404).json({
+					code: '02',
+					message: err
 				});
-			}else{
+			});
+		} else {
 			res.status(404).json({
 				code: '02',
 				message: errInput

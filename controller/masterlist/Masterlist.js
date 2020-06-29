@@ -117,8 +117,10 @@ controller.post = async function (req, res) {
             nama_perusahaan       : req.body.nama_perusahaan_pu,
             nama_penanggung_jawab : req.body.nama_pu,
             email                 : req.body.email_pu,
+            kd_daerah             : req.body.kd_daerah,
             kd_jenis_permohonan   : 8,
-            kd_proses             : 1
+            kd_proses             : 1,
+            kd_layanan            : 1
         }
 
         await model.masterList.create(post_data).then((result) => 
@@ -176,11 +178,10 @@ controller.updateMasterList = async(req,res,next) => {
         ret.pelaku_usaha = {
             nib                     : rs1.nib,
             nama_perusahaan         : rs1.nama_perseroan,
-            kd_kota                 : rs1.kota,
             rt_rw_perusahaan        : rs1.rt_rw,
             alamat_perusahaan       : rs1.alamat,
-            // kd_pos                  : rs1.kode_pos,
-            no_telepon              : rs1.no_telp,
+            kd_pos                  : rs1.kode_pos,
+            no_telepon              : rs1.telepon,
             email                   : rs1.email,
             no_fax                  : rs1.fax,
             nama_penanggung_jawab   : rs2.nama,
@@ -190,8 +191,6 @@ controller.updateMasterList = async(req,res,next) => {
             tujuan_kegiatan         : rs4.tujuan_kegiatan,
             kd_kek                  : rs4.kode_kek,
             kd_kppbc                : rs4.kode_kppbc,
-            kelurahan               : rs4.kelurahan,
-            kd_pos                  : rs4.kode_pos,
             kd_proses               : rs7.status
         }
 
@@ -200,6 +199,11 @@ controller.updateMasterList = async(req,res,next) => {
             tipe_korespodensi       : rs3.tipe_korespondensi,
             nama_korespodensi       : rs3.nama,
             jbt_korespodensi        : rs3.jabatan,
+            kd_provinsi             : rs3.kd_provinsi,
+            kd_kota                 : rs3.kd_kota,
+            kd_kecamatan            : rs3.kd_kecamatan,
+            kd_kelurahan            : rs3.kd_kelurahan,
+            kd_pos                  : rs3.kd_pos,
             alamat_korespodensi     : rs3.alamat,
             jenis_identitas         : rs3.jenis_identitas,
             nomor_identias          : rs3.nomor_identitas,
@@ -209,23 +213,26 @@ controller.updateMasterList = async(req,res,next) => {
         }
 
         ret.wilayah_kerja = {
-            id_permohonan           : req.params.id_permohonan,
-            rt_rw                   : rs5.rt_rw_proyek,
-            daerah_kode             : rs5.kelurahan,
-            kd_kota                 : rs5.kd_kota,
-            // kode_pos                : rs5.kode_pos,
-            alamat                  : rs5.alamat
+            id_permohonan           :  req.params.id_permohonan,
+            rt_rw_wilayah_kerja     :  rs5.rt_rw_wilayah_kerja,
+            kd_provinsi             :  rs5.kd_provinsi,
+            kd_kota                 :  rs5.kd_kota,
+            kd_kecamatan            :  rs5.kd_kecamatan,
+            kd_kelurahan            :  rs5.kd_kelurahan,
+            kd_pos                  :  rs5.kd_pos,
+            alamat                  :  rs5.alamat
         }
 
         ret.lokasi_proyek = {
             id_permohonan           : req.params.id_permohonan,
             rt_rw_proyek            : rs6.rt_rw_proyek,
-            kelurahan               : rs6.kelurahan,
+            kd_provinsi             : rs6.kd_provinsi,
             kd_kota                 : rs6.kd_kota,
-            kode_pos                : rs6.kode_pos,
+            kd_kecamatan            : rs6.kd_kecamatan,
+            kd_kelurahan            : rs6.kd_kelurahan,
+            kd_pos                  : rs6.kd_pos,
             alamat                  : rs6.alamat
         }
-
 
         ress.master = await model.masterList.update(ret.pelaku_usaha,{
             where:{

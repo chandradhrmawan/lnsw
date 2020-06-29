@@ -11,16 +11,25 @@ const masterLokasiProyek = db.define('td_lokasi_proyek', {
 		type: Sequelize.CHAR(26)
 	},
 	rt_rw_proyek: {
-		type: Sequelize.CHAR(100)
-	},
-	kelurahan: {
-		type: Sequelize.CHAR(100)
+		type: Sequelize.STRING
 	},
 	kd_kota: {
 		type: Sequelize.BIGINT
 	},
-	kode_pos: {
-		type: Sequelize.CHAR(5)
+	kd_provinsi: {
+		type: Sequelize.BIGINT
+	},
+	kd_kecamatan: {
+		type: Sequelize.BIGINT
+	},
+	kd_kelurahan: {
+		type: Sequelize.BIGINT
+	},
+	kd_pos: {
+		type: Sequelize.BIGINT
+	},
+	alamat: {
+		type: Sequelize.CHAR(100)
 	}
 }, {
 	schema: 'masterlist',

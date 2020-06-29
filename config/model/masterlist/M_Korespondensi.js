@@ -1,11 +1,12 @@
 const Sequelize = require('sequelize');
 const db = require('../../database/database');
+const masterList = require('./Masterlist');
 
 const masterKoresponden = db.define('td_korespodensi', {
 	id_korespodensi: {
 		type: Sequelize.BIGINT,
-		primaryKey:true,
-		autoIncrement:true,
+		primaryKey: true,
+		autoIncrement: true,
 	},
 	id_permohonan: {
 		type: Sequelize.CHAR(17)
@@ -18,6 +19,21 @@ const masterKoresponden = db.define('td_korespodensi', {
 	},
 	jbt_korespodensi: {
 		type: Sequelize.CHAR(100)
+	},
+	kd_provinsi: {
+		type: Sequelize.BIGINT
+	},
+	kd_kota: {
+		type: Sequelize.BIGINT
+	},
+	kd_kecamatan: {
+		type: Sequelize.BIGINT
+	},
+	kd_kelurahan: {
+		type: Sequelize.BIGINT
+	},
+	kd_pos: {
+		type: Sequelize.BIGINT
 	},
 	alamat_korespodensi: {
 		type: Sequelize.CHAR(100)
@@ -42,5 +58,8 @@ const masterKoresponden = db.define('td_korespodensi', {
 	freezeTableName: true,
 	timestamps: false
 });
+
+// masterList.hasMany(masterKoresponden, { foreignKey: 'id_permohonan' });
+// masterKoresponden.belongsTo(masterList, { foreignKey: 'id_permohonan' });
 
 module.exports = masterKoresponden;

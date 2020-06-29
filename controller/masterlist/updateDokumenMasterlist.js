@@ -27,7 +27,7 @@ controller.update = async function(req,res){
 			tgl_dokumen: Date.now(),
 			id_permohonan: id_permohonan,
 			no_seri_dokumen: req.body.no_seri_dokumen,
-			nib: req.body.nib,
+			nib: get.nib,
 			filename_dokumen: getPath
 		},{
 			transaction: t
