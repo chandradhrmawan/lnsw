@@ -304,13 +304,13 @@ controller.delete = async function(req, res){
 								if(fs.existsSync(getAll.filename_dokumen)){
 									fs.unlinkSync(getAll.filename_dokumen);
 								}
-								await model.dokumen.destroy({
-									where: {
-										id_dokumen: getAll.id_dokumen
-									}
-								},{
-									transaction: t
-								}).then(async(result)=>{
+								// await model.dokumen.destroy({
+								// 	where: {
+								// 		id_dokumen: getAll.id_dokumen
+								// 	}
+								// },{
+								// 	transaction: t
+								// }).then(async(result)=>{
 									await model.M_DetailBarang.destroy({
 										where: {
 											id_detailmasterlist_barang: req.params.id_detailmasterlist_barang
@@ -344,7 +344,7 @@ controller.delete = async function(req, res){
 										})
 									});
 								});
-							});
+							// });
 
 
 }
