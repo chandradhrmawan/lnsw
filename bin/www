@@ -30,6 +30,68 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+/*const socketIo = require("socket.io");
+const io = socketIo(server); // < Interesting!
+
+let interval;
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  // console.log(socket);
+  if (interval) {
+    clearInterval(interval);
+  }
+  interval = setInterval(() => getApiAndEmit(socket), 1000);
+  
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+    clearInterval(interval);
+  });
+
+});
+
+
+interval = setInterval(() => getApiAndEmit(socket), 1000);
+
+// const models = require('../config/model/index');
+
+const getApiAndEmit = (socket) => {
+
+  // model.v_log.findAll();
+
+  let dataArray = [
+    {
+      name: "Layanan Informasi",
+      url: "/layanan-informasi",
+      icon: "fa fa-database",
+    },
+    {
+      name: "Layanan Transaksi",
+      url: "/layanan-transaksi",
+      icon: "fa fa-dollar",
+    },
+    {
+      name: "Layanan Pelaporan",
+      url: "/layanan-pelaporan",
+      icon: "fa fa-file-text-o",
+    },
+    {
+      name: "Form Wizard",
+      url: "/formwizard",
+      icon: "icon-note",
+    },
+    {
+      name: "UI5 Icon",
+      url: "/ui5icon",
+      icon: "icon-emotsmile",
+    }
+  ];
+
+  // const response = new Date();
+  // Emitting a new message. Will be consumed by the client
+  socket.emit("FromAPI", dataArray);
+};*/
+
 /**
  * Normalize a port into a number, string, or false.
  */
