@@ -135,8 +135,6 @@ controller.findbyNib = async function (req, res) {
 	}
 }
 controller.findProvinsi = async function (req, res) {
-	let search = req.query.perseroan;
-	let prov = search.substring(0, 2);
 	try {
 		const provinsi = await model.daerah.findAll({
 			attributes: [
@@ -144,13 +142,13 @@ controller.findProvinsi = async function (req, res) {
 				['daerah_nama', 'NamaProvinsi'],
 			],
 			where: {
-				daerah_kode: prov
+				daerah_induk: '0'
 			}
 		});
 		res.status(200).json({
 			code: '01',
 			message: 'Sukses',
-			dataProv: provinsi[0].dataValues,
+			dataProv: provinsi,
 		});
 	}
 	catch (error) {
