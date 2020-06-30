@@ -171,6 +171,57 @@ controller.deleteBarang = async function (req, res) {
     }
 }
 
+controller.postOld = async function (req, res) {
+    let transaction;
+    let now = moment();
+    let barangId = req.body.barangId;
+    let PermohonanId = req.body.permohonanId;
+    try {
+        let old = await model.masterListBarang.findAll({
+            where: {
+                id_barang: barangId
+            }
+        });
+        let barangOld = old[0].dataValues;
+        transaction = await db.transaction();
+        const MasterlistBarang = {
+            id_barang: BarangInvoice(),
+            id_permohonan: PermohonanId,
+            id_barang_parent: barangId,
+            jenis_barang: barangOld.jenis_barang,
+            kd_perijinan: barangOld.kd_perijinan,
+            nomor_izin: barangOld.nomor_izin,
+            tgl_izin: barangOld.tgl_izin,
+            id_dokumen: barangOld.id_dokumen,
+            doc_name: barangOld.doc_name,
+            jenis_harga: barangOld.jenis_harga,
+            incoterm: barangOld.incoterm,
+            kd_valuta: barangOld.kd_valuta,
+            nilai: barangOld.nilai,
+            berlaku: barangOld.berlaku,
+            nib: barangOld.nib,
+            uraian: barangOld.uraian,
+            create_at: now,
+            update_at: now
+        };
+        await model.masterListBarang.create(MasterlistBarang, { transaction: transaction })
+        await transaction.commit();
+        res.status(201).json({
+            'status': 'OK',
+            'messages': 'Masterlist Barang berhasil ditambahkan',
+            'data': MasterlistBarang,
+        })
+    } catch (error) {
+        if (transaction) {
+            await transaction.rollback()
+            res.status(400).json({
+                'status': 'ERROR',
+                'messages': error.message
+            })
+        }
+    }
+}
+
 controller.postDataForm = async function (req, res) {
     try {
         console.log(req.body, BarangInvoice());

@@ -123,6 +123,10 @@ router.post('/FormData',
 router.post('/dokumen', function (req, res) {
     controller.masterListBarang.upload(req, res)
 });
+//postNewFromOld
+router.post('/OldData', function (req, res) {
+    controller.masterListBarang.postOld(req, res)
+});
 //getAll
 router.get('/getAll', function (req, res) {
     controller.masterListBarang.getAll(req, res)

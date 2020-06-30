@@ -7,7 +7,10 @@ const perijinanRouter = require('./refrensi/perijinan');
 const statusperijinanRouter = require('./refrensi/status_perijinan');
 const gaRouter = require('./refrensi/ga');
 const hscodeRouter = require('./refrensi/hscode');
+// ELASTIC SEARCH
 const esHscodeRouter = require('./elasticsearch/hscode');
+const lartasRouter = require('./elasticsearch/lartas');
+
 const incotermRouter = require('./refrensi/incoterm');
 const jenisDokumenRouter = require('./refrensi/jenis_dokumen');
 const jenisPermohonanRouter = require('./refrensi/jenis_permohonan');
@@ -57,6 +60,7 @@ module.exports = {
     gaRouter: gaRouter,
     hscodeRouter: hscodeRouter,
     esHscodeRouter: esHscodeRouter,
+    lartasRouter: lartasRouter,
     incotermRouter: incotermRouter,
     jenisDokumenRouter: jenisDokumenRouter,
     jenisPermohonanRouter: jenisPermohonanRouter,

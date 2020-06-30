@@ -49,6 +49,7 @@ const berita = require('./berita/Berita');
 
 // CONTROLLER ELASTICSEARCH
 const es_hscode = require('./elasticsearch/Hscode');
+const lartas = require('./elasticsearch/Lartas');
 // END CONTROLLER ELASTICSEARCH
 
 const controller = {};
@@ -89,6 +90,7 @@ controller.berita = berita;
 
 // CONTROLLER ELASTICSEARCH
 controller.es_hscode = es_hscode;
+controller.lartas = lartas;
 // END CONTROLLER ELASTICSEARCH
 
 //CONTROLLER ACL

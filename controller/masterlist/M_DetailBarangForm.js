@@ -116,13 +116,7 @@ controller.getOne = async function(req, res){
 								F.no_seri_dokumen,
 								F.nib,
 								G.ur_jenis_dokumen,
-								H.id_permohonan,
-								I.id_detailbrg_pelabuhan,
-								I.kd_negara,
-								K.ur_negara,
-								I.kd_pelabuhan,
-								J.ur_pelabuhan,
-								I.type AS type_pelabuhan
+								H.id_permohonan 
 						FROM
 							masterlist.td_detail_masterlistbarang A
 						LEFT JOIN
@@ -139,12 +133,6 @@ controller.getOne = async function(req, res){
 							refrensi.tr_jenis_dokumen G on F.kd_dokumen = G.kd_dokumen
 						LEFT JOIN
 							masterlist.td_hdr_masterlistbarang H ON A.id_barang = H.id_barang
-						LEFT JOIN
-							masterlist.td_detailbrg_pelabuhan I ON A.id_detailmasterlist_barang = I.id_detailmasterlist_barang
-						LEFT JOIN
-							refrensi.tr_pelabuhan J ON I.kd_pelabuhan = J.kd_pelabuhan
-						LEFT JOIN
-							refrensi.tr_negara K ON I.kd_negara = K.kd_negara
 						WHERE
 							H.id_permohonan = :id_permohonan
 						AND
@@ -404,7 +392,7 @@ controller.update = async function(req, res){
 						if(validasi){
 							berhasil++;
 						}
-					}
+					  }
 					if(berhasil == updateBarangPelabuhan.length){
 						t.commit();
 						res.status(200).json({

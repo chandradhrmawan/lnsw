@@ -67,6 +67,7 @@ app.use('/api/berita', link.beritaRouter);
 
 // ROUTER ELASTICSEARCH
 app.use('/api/hscode_mobile', link.esHscodeRouter);
+app.use('/api/lartas', link.lartasRouter);
 // END ROUTER ELASTICSEARCH
 
 // app.use('/api', link.refrensiRouter);
