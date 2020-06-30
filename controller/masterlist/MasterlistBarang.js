@@ -247,14 +247,14 @@ controller.getAll = async function (req, res) {
         });
 }
 controller.getFind = async function (req, res) {
-    const Nib = req.params.Nib;
-    const PermohonanId = req.params.PermohonanId;
+    const Nib = req.query.nib;
+    const PermohonanId = req.query.permohonan;
     await model.masterListBarang.findAll({
         attributes: [
             ['id_barang', 'BarangId'],
             ['jenis_barang', 'JenisBarang'],
             ['id_permohonan', 'PermohonanId'],
-            ['id_permohonan_parent', 'ParentPermohonan'],
+            ['id_barang_parent', 'ParentBarang'],
             ['kd_perijinan', 'KodePerijinan'],
             ['tgl_izin', 'TanggalIzin'],
             ['doc_name', 'Path'],

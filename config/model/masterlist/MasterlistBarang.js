@@ -15,7 +15,7 @@ var masterListBarang = db.define('td_hdr_masterlistbarang',
             primaryKey: true
         },
         id_permohonan: Sequelize.STRING,
-        id_permohonan_parent: Sequelize.STRING,
+        id_barang_parent: Sequelize.STRING,
         jenis_barang: Sequelize.STRING,
         kd_perijinan: Sequelize.STRING,
         nomor_izin: Sequelize.STRING,
@@ -38,7 +38,7 @@ var masterListBarang = db.define('td_hdr_masterlistbarang',
 }
 );
 
-masterListBarang.hasMany(M_DetailBarang, {foreignKey: 'id_barang'});
+masterListBarang.hasMany(M_DetailBarang, { foreignKey: 'id_barang' });
 // masterListBarang.belongsTo(Masterlist, { foreignKey: 'id_permohonan' });
 // Masterlist.hasOne(masterListBarang, { foreignKey: 'id_permohonan' });
 

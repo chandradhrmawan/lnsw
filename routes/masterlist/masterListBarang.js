@@ -127,7 +127,7 @@ router.post('/dokumen', function (req, res) {
 router.get('/getAll', function (req, res) {
     controller.masterListBarang.getAll(req, res)
 });
-router.get('/getAll/:Nib/:PermohonanId', function (req, res) {
+router.get('/getBy', function (req, res) {
     controller.masterListBarang.getFind(req, res)
 });
 router.get('/getAll/:Nib', function (req, res) {
