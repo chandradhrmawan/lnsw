@@ -20,5 +20,6 @@ router.delete('/deleteDokumen/:id_dokumen', controller.masterList.deleteDokumen)
 /*admin kek*/
 router.get('/getStatus', controller.masterList.getStatus);
 router.put('/updateStatus/:id_permohonan', controller.masterList.updateStatusPengajuan);
+router.get('/viewPengajuan', controller.masterList.viewPengajuan);
 
 module.exports = router;

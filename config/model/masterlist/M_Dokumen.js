@@ -3,7 +3,8 @@ const db = require('../../database/database');
 
 const masterDokumen = db.define('td_dokumen', {
 	kd_dokumen: {
-		type: Sequelize.CHAR(5)
+		type:Sequelize.STRING,
+		primaryKey:true,
 	},
 	nomor_dokumen: {
 		type: Sequelize.CHAR(100)

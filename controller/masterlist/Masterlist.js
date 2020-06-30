@@ -13,6 +13,7 @@ const helpers    = require('../../helpers/global_helper');
 const fs = require('fs');
 const chmodr = require('chmodr');
 const mkdirp = require('mkdirp');
+const db = require('../../config/database/database');
 
 
 controller.getAll = async function (req, res, next) {
@@ -338,7 +339,107 @@ controller.getStatus = async (req, res, next) => {
         })
     });
 
+}
 
+controller.viewPengajuan = async (req, res, next) => {
+    let id_permohonan = req.query.id_permohonan;
+    const result = {};
+    let sql = `SELECT
+                a.id_permohonan as nomor_pengajuan,
+                a.tgl_pengajuan as tanggal_pengajuan,
+                a.identitas_lain as identitas_lain,
+                a.nomor_identias as nomor_identias,
+                b.nama_layanan as jenis_pengajuan,
+                a.tujuan_kegiatan as tujuan_kegiatan,
+                c.provinsi as provinsi,
+                c.kabupaten as kota,
+                c.kecamatan as kecamatan,
+                c.daerah_nama as kelurahan,
+                a.kd_pos as kd_pos,
+                a.rt_rw_perusahaan as rt_rw,
+                a.alamat_perusahaan as alamat,
+                j.provinsi as provinsi_pengajuan,
+                j.kabupaten as kota_pengajuan,
+                j.kecamatan as kecamatan_pengajuan,
+                j.daerah_nama as kelurahan_pengajuan,
+                d.kd_kek,
+                d.ur_kek,
+                e.kd_kpbc,
+                e.urkdkpbc,
+                g.provinsi as provinsi_lokasi_proyek,
+                g.kabupaten as kota_lokasi_proyek,
+                g.kecamatan as kecamatan_lokasi_proyek,
+                g.daerah_nama as kelurahan_lokasi_proyek,
+                f.alamat as alamat_lokasi_proyek,
+                f.kd_pos as kd_pos_lokasi_proyek,
+                i.provinsi as provinsi_wilayah_kerja,
+                i.kabupaten as kota_wilayah_kerja,
+                i.kecamatan as kecamatan_wilayah_kerja,
+                i.daerah_nama as kelurahan_wilayah_kerja,
+                h.alamat as alamat_wilayah_kerja,
+                h.kd_pos as kd_pos_wilayah_kerja
+            FROM
+                masterlist.td_masterlist a
+                LEFT join refrensi.tr_layanan b on b.kd_layanan         = a.kd_layanan
+                join refrensi.vtr_daerah c on a.kd_daerah::varchar(50)  =  c.daerah_kode
+                join refrensi.vtr_daerah j on a.kd_daerah_pengajuan::varchar(50)  =  j.daerah_kode
+                LEFT join refrensi.tr_kek d on d.kd_kek   = a.kd_kek
+                LEFT join refrensi.tr_kpbc e on e.kd_kpbc = a.kd_kppbc
+                LEFT join masterlist.td_lokasi_proyek f on f.id_permohonan     = a.id_permohonan
+                LEFT join refrensi.vtr_daerah g on f.kd_provinsi::varchar(50)  =  g.kd_provinsi
+                        and f.kd_provinsi::varchar(50)  = g.kd_provinsi 
+                        and f.kd_kota::varchar(50)      = g.kd_kabupaten
+                        and f.kd_kecamatan::varchar(50) = g.kd_kecamatan    
+                        and f.kd_kelurahan::varchar(50) = g.daerah_kode
+                LEFT join masterlist.td_wilayah_kerja h on h.id_permohonan     = a.id_permohonan
+                LEFT join refrensi.vtr_daerah i on h.kd_provinsi::varchar(50)  =  i.kd_provinsi
+                        and f.kd_provinsi::varchar(50)  = i.kd_provinsi 
+                        and f.kd_kota::varchar(50)       = i.kd_kabupaten
+                        and f.kd_kecamatan::varchar(50) = i.kd_kecamatan    
+                        and f.kd_kelurahan::varchar(50) = i.daerah_kode
+                where a.id_permohonan = :id_permohonan`;
+
+    const data = await db.query(sql,{
+                    replacements: { id_permohonan: id_permohonan },
+                    type: Op.SELECT
+                });
+
+    if(data){
+
+        result.data_pengajuan = data[0];
+
+        let sql1 = `SELECT
+        a.nomor_dokumen,
+        a.tgl_dokumen,
+        a.filename_dokumen,
+        a.id_dokumen,
+        a.id_permohonan,
+        a.no_seri_dokumen,
+        a.nib,
+        b.ur_jenis_dokumen
+        FROM
+        masterlist.td_dokumen AS a
+        INNER JOIN refrensi.tr_jenis_dokumen AS b ON b.kd_dokumen = a.kd_dokumen
+        where a.id_permohonan = :id_permohonan`;
+
+        const data1 = await db.query(sql1,{
+            replacements: { id_permohonan: id_permohonan },
+            type: Op.SELECT
+        });
+
+        result.dokumen = data1[0];
+
+        res.status(200).json({
+            code: '01',
+            message: 'Success',
+            data:result
+        });
+    }else{
+        res.status(400).json({
+            code: '02',
+            message: 'No Data Found',
+        });
+    }
 }
 
 controller.updateStatusPengajuan = async (req, res, next) => {
@@ -351,7 +452,8 @@ controller.updateStatusPengajuan = async (req, res, next) => {
         tgl_keputusan       : Date.now(),
         tgl_awal_berlaku    : req.body.tgl_awal_berlaku,
         tgl_akhir_berlaku   : req.body.tgl_akhir_berlaku,
-        catatan             : req.body.catatan
+        catatan             : req.body.catatan,
+        kd_proses           : req.body.kode_proses
      }
 
      let resp = await model.masterList.update(post_data,{
