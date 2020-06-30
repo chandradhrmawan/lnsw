@@ -571,7 +571,7 @@ controller.getDokumen = async (req, res, next) => {
         res.status(400).json({
             code: '02',
             message: 'Error',
-            data:err
+            result:err
         })
     });
 }
