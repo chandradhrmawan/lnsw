@@ -35,6 +35,9 @@ const masterKoresponden = db.define('td_korespodensi', {
 	kd_pos: {
 		type: Sequelize.BIGINT
 	},
+	rt_rw_korespondensi: {
+		type: Sequelize.CHAR(100)
+	},
 	alamat_korespodensi: {
 		type: Sequelize.CHAR(100)
 	},

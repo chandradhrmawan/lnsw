@@ -1,0 +1,180 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "description": "INSW Api Documentation",
+      "version": "1.0.0",
+      "title": "INSW API"
+    },
+    "_servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "localhost"
+        },
+        {
+            "url": "http://10.8.3.198:3004",
+            "description": "Backend Dev"
+        },
+        {
+            "url": "http://10.8.3.198:8000",
+            "description": "Kong"
+        },
+        {
+            "url": "http://10.8.3.73",
+            "description": "CI/CD"
+        }
+    ],
+    "tags": [
+        {
+          "name": "Mobile-API",
+          "description": "Indonesia Nasional Single Window"
+        }
+    ],
+    "schemes": [
+      "https",
+      "http"
+    ],
+    "paths":{
+        "/api/berita/all?page=":{
+            "get":{
+                "tags":[
+                    "Mobile-API"
+                ],
+                "summary": "Get All Berita",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters":[
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "The number of page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sukses"
+                    }
+                }
+            }
+        },
+        "/api/berita/home":{
+            "get":{
+                "tags":[
+                    "Mobile-API"
+                ],
+                "summary": "Get Berita Home",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sukses"
+                    }
+                }
+            }
+        },
+        "/api/berita/?id=":{
+            "get":{
+                "tags":[
+                    "Mobile-API"
+                ],
+                "summary": "Get Detail Berita",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters":[
+                    {
+                        "in": "query",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "The number of id_berita"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sukses"
+                    }
+                }
+            }
+        },
+        "/api/kurs":{
+            "get":{
+                "tags":[
+                    "Mobile-API"
+                ],
+                "summary": "Get Kurs",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sukses"
+                    }
+                }
+            }
+        },
+        "/api/kurs/search?date=":{
+            "get":{
+                "tags":[
+                    "Mobile-API"
+                ],
+                "summary": "Get Kurs by Date",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters":[
+                    {
+                        "in": "query",
+                        "name": "date",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The date format YYYY-MM-DD"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sukses"
+                    }
+                }
+            }
+        },
+        "/api/hscode_mobile?title=":{
+            "get":{
+                "tags":[
+                    "Mobile-API"
+                ],
+                "summary": "Get HSCODE",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters":[
+                    {
+                        "in": "query",
+                        "name": "title",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Search Keyword"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sukses"
+                    }
+                }
+            }
+        }
+    }
+}

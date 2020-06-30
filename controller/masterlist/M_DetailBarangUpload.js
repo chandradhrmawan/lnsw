@@ -111,105 +111,115 @@ controller.insert = async function(req, res){
 	let t = await db.transaction();
 	try{
 		const file = req.files.file;
-		const filename = file.name;
 		const path_alamat = 'assets/upload/MasterlistBarang/';
-		const filedokumen = path_alamat+Date.now()+'_'+filename;
-		console.log(filedokumen);
-		file.mv('./'+filedokumen, async function(err){
-			if(err){
-				res.status(404).json({
-					code: '02'
-				});
-			}else{
-				// console.log('Berhasi');
-				const modelBarangPelabuhan = [model.M_DetailBarang, model.M_DetailBrangPelabuhan];
-				const valExt = path.extname(file.name);
-				const getKdHs = [];
-				const getData = [];
-				var sama=0;
-				if(valExt == '.xlsx'){
-					const workbook = xlsx.readFile(filedokumen);
-					const sheet_name_list = workbook.SheetNames;
-					const getIdMasterlisBarang = [];
-					for(var i=0; i<sheet_name_list.length; i++){
-						const xlData = xlsx.utils.sheet_to_json(workbook.Sheets[sheet_name_list[i]]);
-						if(i == 1){
-							if(sama == 0){
-								for(var k=0; k<getData.length; k++){
-									for(var j=0; j<xlData.length; j++){
-										if(getData[k].kd_hs == xlData[j].kd_hs){
-											Object.assign(xlData[j], {id_detailmasterlist_barang: getData[k].id_detailmasterlist_barang} );
+		const valExt = path.extname(file.name);
+		// console.log(filedokumen);
+		if(valExt == '.xlsx'){
+			file.name = 'DetailMasterlist_Barang.pdf';
+			const filename = file.name;
+			const filedokumen = path_alamat+Date.now()+'_'+filename;
+			console.log(filedokumen);
+			// return false;
+			file.mv('./'+filedokumen, async function(err){
+				if(err){
+					res.status(404).json({
+						code: '02',
+						message: 'Gagal Mengupload data',
+						data: []
+					});
+				}else{
+					// console.log('Berhasi');
+					const modelBarangPelabuhan = [model.M_DetailBarang, model.M_DetailBrangPelabuhan];
+					const getKdHs = [];
+					const getData = [];
+					var sama=0;
+						const workbook = xlsx.readFile(filedokumen);
+						const sheet_name_list = workbook.SheetNames;
+						const getIdMasterlisBarang = [];
+						for(var i=0; i<sheet_name_list.length; i++){
+							const xlData = xlsx.utils.sheet_to_json(workbook.Sheets[sheet_name_list[i]]);
+							if(i == 1){
+								if(sama == 0){
+									for(var k=0; k<getData.length; k++){
+										for(var j=0; j<xlData.length; j++){
+											if(getData[k].kd_hs == xlData[j].kd_hs){
+												Object.assign(xlData[j], {id_detailmasterlist_barang: getData[k].id_detailmasterlist_barang} );
+											}
 										}
-									}
-								} 
-								model.M_DetailBarangPelabuhan.bulkCreate(xlData).then((result)=>{
-									const validasi = fs.existsSync(filedokumen);
-										if(validasi){
-											fs.unlinkSync(filedokumen);
-										}
-									res.status(200).json({
-										code: '01',
-										message: 'Sukses',
-										data: getData,
-										data1: result
-									})
-								}).catch((err)=>{
-									res.status(404).json({
-										code: '02',
-										message: 'Tidak dapat menyimpan data',
-										data: []
-									});
-								});
-							}
-						}else{
-							for(var k=0; k<xlData.length; k++){
-								for(var j=0; j<xlData.length; j++){
-									if(k != j){
-										if(xlData[k].kd_hs == xlData[j].kd_hs){
-											sama++;
-										}
-									}
-								}
-							}
-							if(sama == 0){
-								for(var j=0; j<xlData.length; j++){
-									Object.assign(xlData[j], {id_barang: req.body.id_barang, kd_status_detailbarang: '2'});
-									getKdHs[j] = xlData[j].kd_hs;
-								}
-									const validasi = await model.M_DetailBarang.bulkCreate(xlData,{
-										transaction: t
-									}).then((result)=>{
-										t.commit();
-										Object.assign(getData, result);
-									}).catch((err)=>{
-										t.rollback();
+									} 
+									model.M_DetailBarangPelabuhan.bulkCreate(xlData).then((result)=>{
 										const validasi = fs.existsSync(filedokumen);
 											if(validasi){
 												fs.unlinkSync(filedokumen);
 											}
 										res.status(200).json({
+											code: '01',
+											message: 'Sukses',
+											data: getData,
+											data1: result
+										})
+									}).catch((err)=>{
+										const validasi = fs.existsSync(filedokumen);
+											if(validasi){
+												fs.unlinkSync(filedokumen);
+											}
+										res.status(404).json({
 											code: '02',
 											message: 'Tidak dapat menyimpan data',
 											data: []
 										});
-										return false;
 									});
+								}
 							}else{
-								res.status(404).json({
-									code: '02',
-									message: 'KD_HS pada sheet 1 memeliki kesamaan'
-								});
+								for(var k=0; k<xlData.length; k++){
+									for(var j=0; j<xlData.length; j++){
+										if(k != j){
+											if(xlData[k].kd_hs == xlData[j].kd_hs){
+												sama++;
+											}
+										}
+									}
+								}
+								if(sama == 0){
+									for(var j=0; j<xlData.length; j++){
+										Object.assign(xlData[j], {id_barang: req.body.id_barang, kd_status_detailbarang: '2'});
+										getKdHs[j] = xlData[j].kd_hs;
+									}
+										const validasi = await model.M_DetailBarang.bulkCreate(xlData,{
+											transaction: t
+										}).then((result)=>{
+											t.commit();
+											Object.assign(getData, result);
+										}).catch((err)=>{
+											t.rollback();
+											const validasi = fs.existsSync(filedokumen);
+												if(validasi){
+													fs.unlinkSync(filedokumen);
+												}
+											res.status(200).json({
+												code: '02',
+												message: 'Tidak dapat menyimpan data',
+												data: []
+											});
+											return false;
+										});
+								}else{
+									res.status(404).json({
+										code: '02',
+										message: 'KD_HS pada sheet 1 memeliki kesamaan'
+									});
+								}
 							}
 						}
-					}
-				}else{
-					res.status(404).json({
-						code: '02',
-						message: 'File excel yang hanya diperbolehkan diupload'
-					});
+				
 				}
-			}
-		})
+			});
+		}else{
+			res.status(404).json({
+				code: '02',
+				message: 'File excel yang hanya diperbolehkan diupload'
+			});
+		}	
 	}catch(err){
 		res.status(404).json({
 			code: '02',

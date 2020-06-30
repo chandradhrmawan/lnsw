@@ -17,6 +17,12 @@ app.use(helmet());
 app.use(cors());
 app.use(fileUpload());
 
+// SWAGGER
+const swaggerUi = require('swagger-ui-express');
+const apiDocumentation = require('./apidoc.json');
+ 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(apiDocumentation));
+// ENDSWAGGER
 
 app.use(require('sanitize').middleware);
 

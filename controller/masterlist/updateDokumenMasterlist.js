@@ -10,17 +10,22 @@ controller.update = async function(req,res){
 	const path_alamat = 'assets/upload/MasterlistBarang';
 	const id_permohonan = req.body.id_permohonan;
 	const file_upload = req.files.file;
-	const params = {
-		id_permohonan: id_permohonan,
-		file_upload: file_upload
-	}
 	// const filename_dokumen = path_alamat+'/'+Date.now()+'_'+filename.name;
 	
 	const validationExt = path.extname(file_upload.name);
 	if(validationExt == '.pdf' || validationExt == '.xlsx'){
+		if(validationExt == '.pdf'){
+			file_upload.name = 'DetailMasterlistBarang.pdf';
+		}else if(validationExt == '.xlsx'){
+			file_upload.name = 'DetailMasterlistBarang.xlsx';
+		}
+		const params = {
+			id_permohonan: id_permohonan,
+			file_upload: file_upload
+		}
 		const get = await helper.uploadData(params);
 		const getPath = get.path.substring(2);
-		console.log(getPath);
+		console.log(get);
 		await model.dokumen.create({
 			kd_dokumen: req.body.kd_dokumen,
 			nomor_dokumen: req.body.nomor_dokumen,

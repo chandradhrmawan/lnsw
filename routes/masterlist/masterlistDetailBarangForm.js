@@ -6,6 +6,7 @@ const coba = require('../../controller/masterlist/M_Korespodensi');
 
 router.get('/', controller.M_DetailBarangForm.getAll);
 router.get('/:id_permohonan/:id_barang', controller.M_DetailBarangForm.getOne);
+router.get('/update', controller.M_DetailBarangForm.getOneUpdate);
 router.post('/', controller.M_DetailBarangForm.insert);
 router.put('/:id_detailmasterlist_barang', controller.M_DetailBarangForm.update);
 router.delete('/:id_detailmasterlist_barang', controller.M_DetailBarangForm.delete);

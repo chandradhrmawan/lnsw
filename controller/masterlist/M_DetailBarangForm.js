@@ -11,6 +11,7 @@ controller.getAll = async function(req, res){
 		await db.query(`SELECT
 							DISTINCT
 								A.*,
+								B.id_hscode,
 								B.hd_code_format,
 								B.id_takik,
 								B.uraian_id,
@@ -18,9 +19,9 @@ controller.getAll = async function(req, res){
 								B.bm_mfn,
 								B.no_skep,
 								B.tanggal_skep,
-								B.berlaku,
-								B.fl_use,
-								B.create_dt,
+								B.berlaku AS berlaku_hscode,
+								b.fl_use,
+								b.create_dt,
 								C.ur_satuan,
 								D.ur_incoterm,
 								E.ur_valuta,
@@ -28,29 +29,39 @@ controller.getAll = async function(req, res){
 								F.nomor_dokumen,
 								F.tgl_dokumen,
 								F.filename_dokumen,
+								F.id_permohonan,
 								F.no_seri_dokumen,
-								H.ur_jenis_dokumen,
-								G.id_permohonan,
-								G.nib,
-								I.id_permohonan
+								F.nib,
+								G.ur_jenis_dokumen,
+								H.id_permohonan,
+								I.id_detailbrg_pelabuhan,
+								I.kd_negara,
+								K.ur_negara,
+								I.kd_pelabuhan,
+								J.ur_pelabuhan,
+								I.type AS type_pelabuhan
 						FROM
-								masterlist.td_detail_masterlistbarang A
+							masterlist.td_detail_masterlistbarang A
 						LEFT JOIN
-								refrensi.tr_hscode B ON A.kd_hs = B.kd_hs
+							refrensi.tr_hscode B ON A.kd_hs = B.kd_hs
 						LEFT JOIN
-								refrensi.tr_satuan C ON A.kd_satuan = C.kd_satuan
+							refrensi.tr_satuan C ON A.kd_satuan = C.kd_satuan
 						LEFT JOIN
-								refrensi.tr_incoterm D ON A.incoterm = D.incoterm
+							refrensi.tr_incoterm D ON A.incoterm = D.incoterm
 						LEFT JOIN
-								refrensi.tr_valuta E ON A.kd_valuta = E.kd_valuta
+							refrensi.tr_valuta E ON A.kd_valuta = E.kd_valuta
 						LEFT JOIN
-								masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen
+							masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen
 						LEFT JOIN
-								masterlist.td_hdr_masterlistbarang G ON A.id_barang = G.id_barang
+							refrensi.tr_jenis_dokumen G on F.kd_dokumen = G.kd_dokumen
 						LEFT JOIN
-								refrensi.tr_jenis_dokumen H on F.kd_dokumen = H.kd_dokumen
+							masterlist.td_hdr_masterlistbarang H ON A.id_barang = H.id_barang
 						LEFT JOIN
-								masterlist.td_hdr_masterlistbarang I ON A.id_barang = I.id_barang
+							masterlist.td_detailbrg_pelabuhan I ON A.id_detailmasterlist_barang = I.id_detailmasterlist_barang
+						LEFT JOIN
+							refrensi.tr_pelabuhan J ON I.kd_pelabuhan = J.kd_pelabuhan
+						LEFT JOIN
+							refrensi.tr_negara K ON I.kd_negara = K.kd_negara
 						ORDER BY
 								A.id_detailmasterlist_barang ASC`).then((result)=>{
 									console.log(result[0].length);
@@ -104,7 +115,13 @@ controller.getOne = async function(req, res){
 								F.no_seri_dokumen,
 								F.nib,
 								G.ur_jenis_dokumen,
-								H.id_permohonan
+								H.id_permohonan,
+								I.id_detailbrg_pelabuhan,
+								I.kd_negara,
+								K.ur_negara,
+								I.kd_pelabuhan,
+								J.ur_pelabuhan,
+								I.type AS type_pelabuhan
 						FROM
 							masterlist.td_detail_masterlistbarang A
 						LEFT JOIN
@@ -121,10 +138,16 @@ controller.getOne = async function(req, res){
 							refrensi.tr_jenis_dokumen G on F.kd_dokumen = G.kd_dokumen
 						LEFT JOIN
 							masterlist.td_hdr_masterlistbarang H ON A.id_barang = H.id_barang
+						LEFT JOIN
+							masterlist.td_detailbrg_pelabuhan I ON A.id_detailmasterlist_barang = I.id_detailmasterlist_barang
+						LEFT JOIN
+							refrensi.tr_pelabuhan J ON I.kd_pelabuhan = J.kd_pelabuhan
+						LEFT JOIN
+							refrensi.tr_negara K ON I.kd_negara = K.kd_negara
 						WHERE
 							H.id_permohonan = :id_permohonan
 						AND
-							A.id_barang = :id_barang`,{
+							A.id_barang = :id_barang;`,{
 									replacements: {
 										id_permohonan: req.params.id_permohonan,
 										id_barang: req.params.id_barang
@@ -156,6 +179,95 @@ controller.getOne = async function(req, res){
 			data: []
 		})
 	}
+}
+
+controller.getOneUpdate = async function(req, res){
+	await db.query(`SELECT
+							DISTINCT
+								A.*,
+								B.id_hscode,
+								B.hd_code_format,
+								B.id_takik,
+								B.uraian_id,
+								B.uraian_en,
+								B.bm_mfn,
+								B.no_skep,
+								B.tanggal_skep,
+								B.berlaku AS berlaku_hscode,
+								b.fl_use,
+								b.create_dt,
+								C.ur_satuan,
+								D.ur_incoterm,
+								E.ur_valuta,
+								F.kd_dokumen,
+								F.nomor_dokumen,
+								F.tgl_dokumen,
+								F.filename_dokumen,
+								F.id_permohonan,
+								F.no_seri_dokumen,
+								F.nib,
+								G.ur_jenis_dokumen,
+								H.id_permohonan
+						FROM
+							masterlist.td_detail_masterlistbarang A
+						LEFT JOIN
+							refrensi.tr_hscode B ON A.kd_hs = B.kd_hs
+						LEFT JOIN
+							refrensi.tr_satuan C ON A.kd_satuan = C.kd_satuan
+						LEFT JOIN
+							refrensi.tr_incoterm D ON A.incoterm = D.incoterm
+						LEFT JOIN
+							refrensi.tr_valuta E ON A.kd_valuta = E.kd_valuta
+						LEFT JOIN
+							masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen
+						LEFT JOIN
+							refrensi.tr_jenis_dokumen G on F.kd_dokumen = G.kd_dokumen
+						LEFT JOIN
+							masterlist.td_hdr_masterlistbarang H ON A.id_barang = H.id_barang
+						WHERE
+							A.id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
+								replacements: {
+									id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
+								}
+							}).then(async (result1)=>{
+								const [result2, metadata] = await db.query(`SELECT
+																				A.*,
+																				C.ur_negara,
+																				B.ur_pelabuhan
+																		FROM
+																				masterlist.td_detailbrg_pelabuhan A
+																		LEFT JOIN
+																				refrensi.tr_pelabuhan B ON A.kd_pelabuhan = B.kd_pelabuhan
+																		LEFT JOIN
+																				refrensi.tr_negara C ON A.kd_negara = C.kd_negara
+																		WHERE
+																				A.id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
+																					replacements: {
+																						id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
+																					}
+																				});
+								if(result2.length > 0){
+									res.status(200).json({
+										code: '01',
+										message: 'Sukses',
+										detailBarang: result1[0],
+										detailPelabuhan: result2
+									});
+								}else{
+									res.status(200).json({
+										code: '01',
+										message: 'Sukses',
+										detailBarang: result1[0],
+										detailPelabuhan: []
+									});
+								}
+							}).catch((err)=>{
+								res.status(404).json({
+									code: '02',
+									message: 'Tidak dapat menampilkan data',
+									data: []
+								})
+							});
 }
 
 controller.insert =  async function(req, res){

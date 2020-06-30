@@ -204,6 +204,7 @@ controller.updateMasterList = async(req,res,next) => {
             kd_kecamatan            : rs3.kd_kecamatan,
             kd_kelurahan            : rs3.kd_kelurahan,
             kd_pos                  : rs3.kd_pos,
+            rt_rw_korespondensi     : rs3.rt_rw_korespondensi,
             alamat_korespodensi     : rs3.alamat,
             jenis_identitas         : rs3.jenis_identitas,
             nomor_identias          : rs3.nomor_identitas,
@@ -314,6 +315,109 @@ controller.update = async function (req, res, next) {
             message: 'Error'
         })
     });
+}
+
+controller.getStatus = async (req, res, next) => {
+    await model.statusProses.findAll({
+        where:{
+           kode_proses: {
+                [Op.gt]: '3'
+            }
+        }
+    }).then(result => {
+        res.status(200).json({
+            code: '01',
+            message: 'Success',
+            data:result
+        })
+    }).catch(err => {
+        res.status(400).json({
+            code: '02',
+            message: 'Error',
+            data:JSON.parse(JSON.stringify(err.original.sql))
+        })
+    });
+
+
+}
+
+controller.updateStatusPengajuan = async (req, res, next) => {
+     let id_permohonan = req.params.id_permohonan;
+     // console.log(id_permohonan);
+
+     let post_data = {
+        no_keputusan        : req.body.no_keputusan,
+        no_keputusan_parent : req.body.no_keputusan,
+        tgl_keputusan       : Date.now(),
+        tgl_awal_berlaku    : req.body.tgl_awal_berlaku,
+        tgl_akhir_berlaku   : req.body.tgl_akhir_berlaku,
+        catatan             : req.body.catatan
+     }
+
+     let resp = await model.masterList.update(post_data,{
+        where:{
+            id_permohonan:id_permohonan
+        }
+    });
+
+    res.status(200).json({
+        code: '01',
+        message: 'Success',
+        data:post_data
+    })
+
+}
+
+controller.updateDokumen = async (req, res, next) => {
+
+    let id_dokumen = req.params.id_dokumen;
+
+    /*delete old file*/
+    let data_doc = await model.dokumen.findOne({
+        where:{id_dokumen:id_dokumen}
+    });
+    let path  = data_doc.dataValues.filename_dokumen;
+    await helpers.deleteFile(path);
+
+    /*upload new file*/
+    if (!req.files || Object.keys(req.files).length === 0) {
+        res.status(400).json({code: '02',message: 'No File Selected'});
+    }
+    
+    let upload_param = {
+        id_permohonan   : req.body.id_permohonan,
+        file_upload     : req.files.dokumen
+    }
+
+    console.log(upload_param);
+    let data_upload = await helpers.uploadData(upload_param);
+    
+    /*update data*/
+    let post_data = {
+        kd_dokumen       : req.body.kd_dokumen,
+        nomor_dokumen    : req.body.nomor_dokumen,
+        tgl_dokumen      : Date.now(),
+        filename_dokumen : data_upload.path,
+        id_permohonan    : req.body.id_permohonan,
+        no_seri_dokumen  : req.body.no_seri_dokumen,
+        nib              : data_upload.nib
+    }
+
+    let resp = await model.dokumen.update(post_data,{
+        where:{
+            id_dokumen:id_dokumen
+        }
+    });
+
+    console.log(resp);
+
+    
+    res.status(200).json({
+        code: '01',
+        message: 'Success Edit Dokumen Masterlist',
+        data:post_data
+    })
+   
 }
 
 controller.getOneDokumen = async (req, res, next) => {

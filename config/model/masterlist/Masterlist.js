@@ -35,6 +35,7 @@ var masterList = db.define('td_masterlist',
         id_wilayah_kerja: Sequelize.BIGINT,
         kd_proses: Sequelize.STRING,
         kd_layanan: Sequelize.BIGINT,
+        catatan:Sequelize.STRING,
     }, {
     schema: 'masterlist',
     freezeTableName: true,
