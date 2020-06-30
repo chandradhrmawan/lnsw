@@ -372,12 +372,14 @@ controller.viewPengajuan = async (req, res, next) => {
                 g.daerah_nama as kelurahan_lokasi_proyek,
                 f.alamat as alamat_lokasi_proyek,
                 f.kd_pos as kd_pos_lokasi_proyek,
+                f.rt_rw_proyek as rt_rw_proyek,
                 i.provinsi as provinsi_wilayah_kerja,
                 i.kabupaten as kota_wilayah_kerja,
                 i.kecamatan as kecamatan_wilayah_kerja,
                 i.daerah_nama as kelurahan_wilayah_kerja,
                 h.alamat as alamat_wilayah_kerja,
-                h.kd_pos as kd_pos_wilayah_kerja
+                h.kd_pos as kd_pos_wilayah_kerja,
+                h.rt_rw_wilayah_kerja as rt_rw_wilayah_kerja
             FROM
                 masterlist.td_masterlist a
                 LEFT join refrensi.tr_layanan b on b.kd_layanan         = a.kd_layanan
@@ -409,6 +411,7 @@ controller.viewPengajuan = async (req, res, next) => {
         result.data_pengajuan = data[0];
 
         let sql1 = `SELECT
+        row_number() OVER (ORDER BY a.tgl_dokumen DESC) AS no,
         a.nomor_dokumen,
         to_char(a.tgl_dokumen,'DD-MM-YYYY HH24-MI-SS') as tgl_dokumen,
         a.filename_dokumen,
@@ -420,7 +423,8 @@ controller.viewPengajuan = async (req, res, next) => {
         FROM
         masterlist.td_dokumen AS a
         INNER JOIN refrensi.tr_jenis_dokumen AS b ON b.kd_dokumen = a.kd_dokumen
-        where a.id_permohonan = :id_permohonan`;
+        where a.id_permohonan = :id_permohonan
+        order by a.tgl_dokumen DESC`;
 
         const data1 = await db.query(sql1,{
             replacements: { id_permohonan: id_permohonan },
