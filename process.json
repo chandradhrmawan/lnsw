@@ -1,0 +1,7 @@
+{
+  "watch": ["server", "client"],
+  "ignore_watch" : ["public","assets"],
+  "watch_options": {
+    "followSymlinks": false
+  }
+}
