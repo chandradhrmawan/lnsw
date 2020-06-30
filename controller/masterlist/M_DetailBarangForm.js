@@ -16,7 +16,7 @@ controller.getAll = async function(req, res){
 								B.id_takik,
 								B.uraian_id,
 								B.uraian_en,
-								B.bm_mfn,
+								B.bm_mfn, 
 								B.no_skep,
 								B.tanggal_skep,
 								B.berlaku AS berlaku_hscode,
@@ -89,6 +89,7 @@ controller.getAll = async function(req, res){
 
 
 controller.getOne = async function(req, res){
+	let t = await db.transaction();
 	try{
 		await db.query(`SELECT
 							DISTINCT
@@ -151,7 +152,43 @@ controller.getOne = async function(req, res){
 									replacements: {
 										id_permohonan: req.params.id_permohonan,
 										id_barang: req.params.id_barang
-									}}).then((result)=>{
+									}}).then(async (result)=>{
+										console.log('Mencoba'); 
+										const[data, metadata] = await db.query(`select
+																						SUM(A.nilai) as total
+																				from
+																						masterlist.td_detail_masterlistbarang A
+																				inner join
+																						masterlist.td_hdr_masterlistbarang B ON A.id_barang = B.id_barang
+																				where
+																						B.id_permohonan = :id_permohonan
+																				AND
+																						A.id_barang = :id_barang`,{
+																				replacements: {
+																					id_permohonan: req.params.id_permohonan,
+																					id_barang: req.params.id_barang
+																				}
+																			});
+											if(data[0].total != 0){
+												console.log(data);
+												await model.masterListBarang.update({
+													nilai: data[0].total
+												},{
+													where:{
+														[Op.and]: [{
+															id_permohonan: req.params.id_permohonan,
+														},{
+															id_barang: req.params.id_barang
+														}]
+													}
+												},{
+													transaction: t
+												}).then((result)=>{
+													t.commit();
+													console.log('berhasil');
+												});
+											}
+
 											if(result[0].length > 0){
 												res.status(200).json({
 													code: '01',
@@ -251,7 +288,7 @@ controller.getOneUpdate = async function(req, res){
 										code: '01',
 										message: 'Sukses',
 										detailBarang: result1[0],
-										detailPelabuhan: result2
+										detailPelabuhan: result2[0]
 									});
 								}else{
 									res.status(200).json({

@@ -58,6 +58,7 @@ app.use('/api/jenisBarang', link.jenisBarang);
 app.use('/api/kek', link.kek);
 app.use('/api/jenisLayanan', link.layanan);
 app.use('/api/statusProses', link.statusProses);
+app.use('/api/tipeKegiatan', link.tipeKegiatan);
 //END ROUTER REFRENSI
 
 // ROUTER BERITA

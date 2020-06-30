@@ -182,7 +182,7 @@ controller.insert = async function(req, res){
 								}
 								if(sama == 0){
 									for(var j=0; j<xlData.length; j++){
-										Object.assign(xlData[j], {id_barang: req.body.id_barang, kd_status_detailbarang: '2'});
+										Object.assign(xlData[j], {id_barang: req.body.id_barang, kd_status_detailbarang: ''});
 										getKdHs[j] = xlData[j].kd_hs;
 									}
 										const validasi = await model.M_DetailBarang.bulkCreate(xlData,{

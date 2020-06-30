@@ -51,7 +51,13 @@ helpers.sendEmail = function(id_permohonan){
 					    "data:": {
 					      "uri": "/login/success",
 					      "moduleName": "Registration",
-					      "transactionId": "K/L0001"
+					      "transactionId": "K/L0001",
+					      "transactionData": {
+					      	"requestNumber": "test",
+					      	"moduleName": "test module",
+					      	"dateAccepted": "testing date",
+					      	"acceptedNumber": "accepted12345"
+					      }
 					    },
 					    "message": {
 					      "type": "Notification",

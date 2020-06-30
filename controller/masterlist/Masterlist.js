@@ -346,7 +346,7 @@ controller.viewPengajuan = async (req, res, next) => {
     const result = {};
     let sql = `SELECT
                 a.id_permohonan as nomor_pengajuan,
-                a.tgl_pengajuan as tanggal_pengajuan,
+                to_char(a.tgl_pengajuan,'DD-MM-YYYY HH24-MI-SS') as tanggal_pengajuan,
                 a.identitas_lain as identitas_lain,
                 a.nomor_identias as nomor_identias,
                 b.nama_layanan as jenis_pengajuan,
@@ -410,7 +410,7 @@ controller.viewPengajuan = async (req, res, next) => {
 
         let sql1 = `SELECT
         a.nomor_dokumen,
-        a.tgl_dokumen,
+        to_char(a.tgl_dokumen,'DD-MM-YYYY HH24-MI-SS') as tgl_dokumen,
         a.filename_dokumen,
         a.id_dokumen,
         a.id_permohonan,
@@ -443,30 +443,41 @@ controller.viewPengajuan = async (req, res, next) => {
 }
 
 controller.updateStatusPengajuan = async (req, res, next) => {
-     let id_permohonan = req.params.id_permohonan;
-     // console.log(id_permohonan);
+     
+    try{
 
-     let post_data = {
-        no_keputusan        : req.body.no_keputusan,
-        no_keputusan_parent : req.body.no_keputusan,
-        tgl_keputusan       : Date.now(),
-        tgl_awal_berlaku    : req.body.tgl_awal_berlaku,
-        tgl_akhir_berlaku   : req.body.tgl_akhir_berlaku,
-        catatan             : req.body.catatan,
-        kd_proses           : req.body.kode_proses
-     }
-
-     let resp = await model.masterList.update(post_data,{
-        where:{
-            id_permohonan:id_permohonan
+        let id_permohonan = req.params.id_permohonan;
+         
+        let post_data = {
+            no_keputusan        : req.body.no_keputusan,
+            no_keputusan_parent : req.body.no_keputusan,
+            tgl_keputusan       : Date.now(),
+            tgl_awal_berlaku    : req.body.tgl_awal_berlaku,
+            tgl_akhir_berlaku   : req.body.tgl_akhir_berlaku,
+            catatan             : req.body.catatan,
+            kd_proses           : req.body.kode_proses
         }
-    });
 
-    res.status(200).json({
-        code: '01',
-        message: 'Success',
-        data:post_data
-    })
+        let resp = await model.masterList.update(post_data,{
+            where:{
+                id_permohonan:id_permohonan
+            }
+        });
+
+        res.status(200).json({
+            code: '01',
+            message: 'Success',
+            data:post_data
+        })
+
+    }catch(err){
+        res.status(400).json({
+            code: '02',
+            message: 'Error',
+            data:err
+        })
+    }
+     
 
 }
 

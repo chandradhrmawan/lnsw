@@ -44,6 +44,7 @@ const kurs = require('./refrensi/tr_kurs_model');
 const jenisBarang = require('./refrensi/jenisBarang');
 const layanan = require('./refrensi/layanan');
 const statusProses = require('./refrensi/status_proses');
+const tipeKegiatan = require('./refrensi/tr_tipekegiatan');
 // END MODEL REFRENSI
 
 // MODEL BERITA
@@ -103,6 +104,7 @@ model.kurs = kurs;
 model.jenisBarang = jenisBarang;
 model.layanan = layanan;
 model.statusProses = statusProses;
+model.tipeKegiatan = tipeKegiatan;
 //END MODEL REFRENSI
 
 // MODEL BERITA

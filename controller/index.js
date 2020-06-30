@@ -39,6 +39,7 @@ const jenisBarang = require('./refrensi/jenisBarang');
 const log = require('./log/log');
 const kek = require('./refrensi/Kek');
 const statusProses = require('./refrensi/status_proses');
+const tipeKegiatan = require('./refrensi/tipeKegiatan');
 // END CONTROLLER REFRENSI
 // const sendEmail = require('./sendNotification/sendEmail');
 
@@ -79,6 +80,7 @@ controller.jenisBarang = jenisBarang;
 controller.kek = kek;
 controller.layanan = layanan;
 controller.statusProses = statusProses;
+controller.tipeKegiatan = tipeKegiatan;
 // END CONTROLLER REFRENSI
 
 // CONTROLLER BERITA
