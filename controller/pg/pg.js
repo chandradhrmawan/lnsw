@@ -1,6 +1,12 @@
 const model = require('../../config/model/index');
+const view = require('../../config/model/view/v_masterlist');
 const { Op } = require('sequelize');
 const controller = {};
+
+
+controller.getView = async (req,res,next) => {
+    console.log(view);
+}
 
 controller.getAll = async function (req, res, next) {
     let limit           = req.query.limit;
