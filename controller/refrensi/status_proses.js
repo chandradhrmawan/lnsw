@@ -10,7 +10,11 @@ controller.getAll = async function (req, res) {
         attributes: [
                     ['kode_proses', 'kode_proses'], 
                     ['ur_proses', 'ur_proses']
-        ]
+        ],where: {
+            kode_proses:{
+                [Op.gt]: '4'
+            }
+        }
     })
         .then((result) => {
             if (result.length > 0) {
