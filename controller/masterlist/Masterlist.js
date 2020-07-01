@@ -51,6 +51,9 @@ controller.filterMasterlist  = async (req,res,next) => {
         let response        = {}
         response.page       = req.query.page;
 
+        let role            = (req.query.user_role == 'admin_kek') ? '1' : '0';
+        //console.log(role);
+
         response.result = await model.v_masterlist_head.findAndCountAll({
             attributes : [
                             ['no','no'],
@@ -66,6 +69,9 @@ controller.filterMasterlist  = async (req,res,next) => {
             offset:page,
             order:[['tgl_pengajuan','desc']],
             where: {
+            kd_proses : {
+                [Op.gt]: role
+            }, 
             [Op.or]: [
             {
                 id_permohonan: {
