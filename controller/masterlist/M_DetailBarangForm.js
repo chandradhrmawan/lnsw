@@ -107,6 +107,7 @@ controller.getOneUpdate = async function(req, res){
 			id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
 		}
 	}).then(async (result1)=>{
+			console.log(result1[0].dataValues);
 			await model.v_detail_pelabuhan.findAll({
 				where:{
 					id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
@@ -115,7 +116,7 @@ controller.getOneUpdate = async function(req, res){
 				res.status(200).json({
 					code: '01',
 					message: 'Sukses',
-					detailBarang: result1,
+					detailBarang: result1[0].dataValues,
 					detailPelabuhan: result2
 				});
 			}).catch((err)=>{

@@ -54,7 +54,11 @@ controller.find = async (req,res,next) => {
             data: ress
         });
     }).catch((err)=> {
-
+        res.status(400).json({
+            code: '02',
+            message: 'Error',
+            data: err
+        });
     })
 }
 
