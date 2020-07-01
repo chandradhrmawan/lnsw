@@ -21,5 +21,6 @@ router.delete('/deleteDokumen/:id_dokumen', controller.masterList.deleteDokumen)
 router.get('/getStatus', controller.masterList.getStatus);
 router.put('/updateStatus/:id_permohonan', controller.masterList.updateStatusPengajuan);
 router.get('/viewPengajuan', controller.masterList.viewPengajuan);
+router.get('/filterMasterlist', controller.masterList.filterMasterlist);
 
 module.exports = router;

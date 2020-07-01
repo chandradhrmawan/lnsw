@@ -12,25 +12,34 @@ controller.getView = async (req,res,next) => {
             nomor_pengajuan : id_permohonan
         }
     })
-    .then(ress => {
-        console.log(ress[0]);
+    .then(async(ress)=> {
         response.data_pengajuan = (ress[0]) ? ress[0].dataValues : [];
-        console.log(response);
+        await view.v_dokumen_masterlist.findAll({
+            where : {
+                id_permohonan : id_permohonan
+            }
+        }).then((ress1)=>{
+            console.log(ress1.length);
 
-        
-
-        /*res.status(200).json({
-             code: '01',
-             message: 'Success',
-             data:ress
-        });*/
-       /*}else{
-        res.status(200).json({
-             code: '02',
-             message: 'Data Not Found',
-             data:{}
-        });
-       }*/
+            let doc = []
+            if(ress1.length > 0){
+                for (var i = 0; i < ress1.length; i++) {
+                    doc.push(ress1[i].dataValues);
+                }
+            }
+            response.dokumen = doc;
+            res.status(200).json({
+                code: '01',
+                message: 'Success',
+                data:response
+            });
+        }).catch(err => {
+            res.status(400).json({
+                code: '02',
+                message: 'Error',
+                data:err
+            });
+        })
     }).catch(err => {
         res.status(400).json({
              code: '02',
@@ -41,13 +50,15 @@ controller.getView = async (req,res,next) => {
 }
 
 controller.getAll = async function (req, res, next) {
+    
+    try{
+
     let limit           = req.query.limit;
     let page            = 0 + (req.query.page - 1) * limit;
     let search          = req.query.search;
 
     let response        = {}
     response.page       = req.query.page;
-    try{
 
       response.result = await model.v_masterlist_head.findAndCountAll({
             attributes : [
@@ -104,7 +115,7 @@ controller.getAll = async function (req, res, next) {
 
        res.status(200).json({
          code: '01',
-         message: 'Success',
+         message: 'Success1',
          data:response
        });
 
@@ -112,7 +123,7 @@ controller.getAll = async function (req, res, next) {
 
         res.status(200).json({
           code: '01',
-          message: 'Success',
+          message: 'Success2',
           data: response,
         })
     }

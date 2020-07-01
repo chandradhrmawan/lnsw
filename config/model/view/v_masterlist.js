@@ -57,13 +57,13 @@ view.v_masterList_head = db.define('v_masterlist_head',
 );
 
 
-view.v_pengajuan_masterlist = db.define('v_masterlist_head',
+view.v_pengajuan_masterlist = db.define('v_pengajuan_masterlist',
     {
         nomor_pengajuan : {
             type        : Sequelize.STRING,
             primaryKey  : true
         },
-        tgl_pengajuan              : Sequelize.STRING,
+        tanggal_pengajuan          : Sequelize.STRING,
         identitas_lain             : Sequelize.STRING,
         nomor_identias             : Sequelize.STRING,
         jenis_pengajuan            : Sequelize.STRING,
@@ -97,6 +97,28 @@ view.v_pengajuan_masterlist = db.define('v_masterlist_head',
         alamat_wilayah_kerja       : Sequelize.STRING,
         kd_pos_wilayah_kerja       : Sequelize.STRING,
         rt_rw_wilayah_kerja        : Sequelize.STRING
+    },{
+    schema: 'masterlist',
+    freezeTableName: true,
+    timestamps: false
+}
+);
+
+view.v_dokumen_masterlist = db.define('v_dokumen_masterlist',
+    {
+        id_dokumen : {
+            type        : Sequelize.STRING,
+            primaryKey  : true
+        },
+        no               : Sequelize.STRING,
+        kd_dokumen       : Sequelize.STRING,
+        ur_jenis_dokumen : Sequelize.STRING,
+        nomor_dokumen    : Sequelize.STRING,
+        tgl_dokumen      : Sequelize.STRING,
+        filename_dokumen : Sequelize.STRING,
+        id_permohonan    : Sequelize.STRING,
+        no_seri_dokumen  : Sequelize.STRING,
+        nib              : Sequelize.STRING
     },{
     schema: 'masterlist',
     freezeTableName: true,
