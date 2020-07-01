@@ -135,7 +135,7 @@ controller.getOne = async function(req, res){
 							masterlist.td_hdr_masterlistbarang H ON A.id_barang = H.id_barang
 						WHERE
 							H.id_permohonan = :id_permohonan
-						AND
+						AND  
 							A.id_barang = :id_barang;`,{
 									replacements: {
 										id_permohonan: req.params.id_permohonan,
@@ -157,7 +157,7 @@ controller.getOne = async function(req, res){
 																					id_barang: req.params.id_barang
 																				}
 																			});
-											if(data[0].total != 0){
+											if(data[0].total != 0 && data[0].total != ''){
 												console.log(data);
 												await model.masterListBarang.update({
 													nilai: data[0].total
@@ -256,16 +256,18 @@ controller.getOneUpdate = async function(req, res){
 								}
 							}).then(async (result1)=>{
 								const [result2, metadata] = await db.query(`SELECT
-																				A.*,
-																				C.ur_negara,
-																				B.ur_pelabuhan
-																		FROM
+																					A.id_detailbrg_pelabuhan,
+																					A.id_detailmasterlist_barang,
+																					A.kd_negara||'-'||C.ur_negara data_negara,
+																					A.kd_pelabuhan||'-'||B.ur_pelabuhan data_pelabuhan,
+																					A.type
+																			FROM 
 																				masterlist.td_detailbrg_pelabuhan A
-																		LEFT JOIN
+																			LEFT JOIN
 																				refrensi.tr_pelabuhan B ON A.kd_pelabuhan = B.kd_pelabuhan
-																		LEFT JOIN
+																			LEFT JOIN
 																				refrensi.tr_negara C ON A.kd_negara = C.kd_negara
-																		WHERE
+																			WHERE
 																				A.id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
 																					replacements: {
 																						id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
@@ -374,21 +376,28 @@ controller.update = async function(req, res){
 			}
 		},{
 			trasaction: t
-		}).then((result)=>{
+		}).then(async (result)=>{
 				if(ObjectLength == 2){
 					var berhasil = 0;
 					const updateBarangPelabuhan = updateData.detailPelabuhan;
 					for(var i=0 ; i<updateBarangPelabuhan.length; i++){
-						const validasi = model.M_DetailBarangPelabuhan.update(updateBarangPelabuhan[i],{
-							where:{
-								[Op.and]: [
-									{id_detailmasterlist_barang: req.params.id_detailmasterlist_barang},
-									{id_detailbrg_pelabuhan: updateBarangPelabuhan[i].id_detailbrg_pelabuhan}]
-							}
-						},{
-							trasaction: t
-						});
-
+						if(updateBarangPelabuhan[i].id_detailbrg_pelabuhan != 0){
+							const validasi = await model.M_DetailBarangPelabuhan.update(updateBarangPelabuhan[i],{
+								where:{
+									[Op.and]: [
+										{id_detailmasterlist_barang: req.params.id_detailmasterlist_barang},
+										{id_detailbrg_pelabuhan: updateBarangPelabuhan[i].id_detailbrg_pelabuhan}]
+									}
+								},{
+									trasaction: t
+								});
+						}else{
+							delete updateBarangPelabuhan[i].id_detailbrg_pelabuhan;
+							Object.assign(updateBarangPelabuhan[i], {id_detailmasterlist_barang: req.params.id_detailmasterlist_barang});
+							const validasi = await model.M_DetailBarangPelabuhan.create(updateBarangPelabuhan[i],{
+								transaction: t
+							});
+						}
 						if(validasi){
 							berhasil++;
 						}
