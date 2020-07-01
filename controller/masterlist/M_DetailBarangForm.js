@@ -59,12 +59,11 @@ controller.getOne = async function(req, res){
 													AND
 															A.id_barang = :id_barang`,{
 													replacements: {
-														id_permohonan: req.params.id_permohonan,
-														id_barang: req.params.id_barang
+														id_permohonan: req.query.id_permohonan,
+														id_barang: req.query.id_barang
 													}
 												});
-				if(data[0].total != 0 && data[0].total != ''){
-					console.log(data);
+				if(data[0].total != 0){
 					await model.masterListBarang.update({
 						nilai: data[0].total
 					},{
@@ -79,14 +78,12 @@ controller.getOne = async function(req, res){
 						transaction: t
 					}).then((result)=>{
 						t.commit();
-						console.log('berhasil');
 					});
 				}
-
 				res.status(200).json({
 					code: '01',
 					message: 'Sukses',
-					data: result[0]
+					data: result
 				});
 		}).catch((err)=>{
 			res.status(400).json({
@@ -147,7 +144,6 @@ controller.insert =  async function(req, res){
 			const postData = req.body;
 			const postDetailBarang = postData.detailBarang;
 			const ObjectLength = Object.keys(postData).length;
-			console.log(ObjectLength);
 			await model.M_DetailBarang.create(postDetailBarang,{
 				transaction: t
 			}).then((result)=>{
