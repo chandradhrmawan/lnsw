@@ -126,9 +126,9 @@ helpers.uploadData = async (param) => {
 	});
 
 	//close privilege to read only
-	chmodr(path_upload, 0o544, (err) => {
+	/*chmodr(path_upload, 0o544, (err) => {
 		if (err) console.log(err);
-	});
+	});*/
 
 	ress.nib = nib;
 	ress.path = full_path;
@@ -155,9 +155,9 @@ helpers.deleteFile = async (full_path) => {
 			});
 
 			//close privilege
-			chmodr(full_path, 0o544, (err) => {
+			/*chmodr(full_path, 0o544, (err) => {
 				if (err) console.log(err);
-			});
+			});*/
 		}
 		return
 	})

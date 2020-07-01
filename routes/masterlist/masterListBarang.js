@@ -74,8 +74,8 @@ check('Nib')
         controller.masterListBarang.postDataForm(req, res)
     });
 //post Data masterlistbarang +Dokumen
-router.post('/FormData',
-    [check('JenisBarang')
+router.post('/FormData',controller.masterListBarang.postData);
+    /*[check('JenisBarang')
         .isLength({ max: 45 })
         .blacklist('~!@#$%^&*()_+=<>{}?/":')
         .trim()
@@ -116,9 +116,9 @@ router.post('/FormData',
     check('Nib')
         .isLength({ max: 26 })
         .trim()
-        .escape()], function (req, res) {
+        .escape()], *//*function (req, res) {
             controller.masterListBarang.postData(req, res)
-        });
+        });*/
 //postDokumen
 router.post('/dokumen', function (req, res) {
     controller.masterListBarang.upload(req, res)
