@@ -69,9 +69,9 @@ controller.getOne = async function(req, res){
 					},{
 						where:{
 							[Op.and]: [{
-								id_permohonan: req.params.id_permohonan,
+								id_permohonan: req.query.id_permohonan,
 							},{
-								id_barang: req.params.id_barang
+								id_barang: req.query.id_barang
 							}]
 						}
 					},{
