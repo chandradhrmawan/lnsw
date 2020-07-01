@@ -3,7 +3,7 @@ const db = require('../../database/database');
 const view = {};
 
 
-view.v_masterList_head = db.define('v_masterlist_head',
+view.v_masterlist_head = db.define('v_masterlist_head',
     {
         id_permohonan: {type:Sequelize.STRING,primaryKey:true},
         id_permohonan_parent        : Sequelize.STRING,

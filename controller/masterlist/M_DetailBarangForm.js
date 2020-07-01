@@ -8,77 +8,25 @@ const fs = require('fs');
 
 controller.getAll = async function(req, res){
 	try{
-		await db.query(`SELECT
-							DISTINCT
-								A.*,
-								B.id_hscode,
-								B.hd_code_format,
-								B.id_takik,
-								B.uraian_id,
-								B.uraian_en,
-								B.bm_mfn, 
-								B.no_skep,
-								B.tanggal_skep,
-								B.berlaku AS berlaku_hscode,
-								b.fl_use,
-								b.create_dt,
-								C.ur_satuan,
-								D.ur_incoterm,
-								E.ur_valuta,
-								F.kd_dokumen,
-								F.nomor_dokumen,
-								F.tgl_dokumen,
-								F.filename_dokumen,
-								F.id_permohonan,
-								F.no_seri_dokumen,
-								F.nib,
-								G.ur_jenis_dokumen,
-								H.id_permohonan,
-								I.id_detailbrg_pelabuhan,
-								I.kd_negara,
-								K.ur_negara,
-								I.kd_pelabuhan,
-								J.ur_pelabuhan,
-								I.type AS type_pelabuhan
-						FROM
-							masterlist.td_detail_masterlistbarang A
-						LEFT JOIN
-							refrensi.tr_hscode B ON A.kd_hs = B.kd_hs
-						LEFT JOIN
-							refrensi.tr_satuan C ON A.kd_satuan = C.kd_satuan
-						LEFT JOIN
-							refrensi.tr_incoterm D ON A.incoterm = D.incoterm
-						LEFT JOIN
-							refrensi.tr_valuta E ON A.kd_valuta = E.kd_valuta
-						LEFT JOIN
-							masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen
-						LEFT JOIN
-							refrensi.tr_jenis_dokumen G on F.kd_dokumen = G.kd_dokumen
-						LEFT JOIN
-							masterlist.td_hdr_masterlistbarang H ON A.id_barang = H.id_barang
-						LEFT JOIN
-							masterlist.td_detailbrg_pelabuhan I ON A.id_detailmasterlist_barang = I.id_detailmasterlist_barang
-						LEFT JOIN
-							refrensi.tr_pelabuhan J ON I.kd_pelabuhan = J.kd_pelabuhan
-						LEFT JOIN
-							refrensi.tr_negara K ON I.kd_negara = K.kd_negara
-						ORDER BY
-								A.id_detailmasterlist_barang ASC`).then((result)=>{
-									console.log(result[0].length);
-									if(result[0].length > 0){
-										res.status(200).json({
-											code: '01',
-											message: 'Sukses',
-											data: result[0]
-										});
-									}else{
-										res.status(200).json({
-											code: '02',
-											message: 'Sukse',
-											data: 'Tidak ada Data'
-										});
-									}
-								});
+		await model.v_detail_by_header.findAll({
+			order: [
+				['id_detailmasterlist_barang', 'DESC']
+			]
+		}).then((result)=>{
+				if(result.length > 0){
+						res.status(200).json({
+						code: '01',
+						message: 'Sukses',
+						data: result
+					});
+				}else{
+					res.status(200).json({
+						code: '02',
+						message: 'Sukses',
+						data: 'Tidak ada Data'
+					});
+				}
+			});
 	}catch(err){
 		res.status(200).json({
 			code: '02',
@@ -91,114 +39,72 @@ controller.getAll = async function(req, res){
 controller.getOne = async function(req, res){
 	let t = await db.transaction();
 	try{
-		await db.query(`SELECT
-							DISTINCT
-								A.*,
-								B.id_hscode,
-								B.hd_code_format,
-								B.id_takik,
-								B.uraian_id,
-								B.uraian_en,
-								B.bm_mfn,
-								B.no_skep,
-								B.tanggal_skep,
-								B.berlaku AS berlaku_hscode,
-								b.fl_use,
-								b.create_dt,
-								C.ur_satuan,
-								D.ur_incoterm,
-								E.ur_valuta,
-								F.kd_dokumen,
-								F.nomor_dokumen,
-								F.tgl_dokumen,
-								F.filename_dokumen,
-								F.id_permohonan,
-								F.no_seri_dokumen,
-								F.nib,
-								G.ur_jenis_dokumen,
-								H.id_permohonan 
-						FROM
-							masterlist.td_detail_masterlistbarang A
-						LEFT JOIN
-							refrensi.tr_hscode B ON A.kd_hs = B.kd_hs
-						LEFT JOIN
-							refrensi.tr_satuan C ON A.kd_satuan = C.kd_satuan
-						LEFT JOIN
-							refrensi.tr_incoterm D ON A.incoterm = D.incoterm
-						LEFT JOIN
-							refrensi.tr_valuta E ON A.kd_valuta = E.kd_valuta
-						LEFT JOIN
-							masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen
-						LEFT JOIN
-							refrensi.tr_jenis_dokumen G on F.kd_dokumen = G.kd_dokumen
-						LEFT JOIN
-							masterlist.td_hdr_masterlistbarang H ON A.id_barang = H.id_barang
-						WHERE
-							H.id_permohonan = :id_permohonan
-						AND  
-							A.id_barang = :id_barang;`,{
-									replacements: {
-										id_permohonan: req.params.id_permohonan,
-										id_barang: req.params.id_barang
-									}}).then(async (result)=>{
-										console.log('Mencoba'); 
-										const[data, metadata] = await db.query(`select
-																						SUM(A.nilai) as total
-																				from
-																						masterlist.td_detail_masterlistbarang A
-																				inner join
-																						masterlist.td_hdr_masterlistbarang B ON A.id_barang = B.id_barang
-																				where
-																						B.id_permohonan = :id_permohonan
-																				AND
-																						A.id_barang = :id_barang`,{
-																				replacements: {
-																					id_permohonan: req.params.id_permohonan,
-																					id_barang: req.params.id_barang
-																				}
-																			});
-											if(data[0].total != 0 && data[0].total != ''){
-												console.log(data);
-												await model.masterListBarang.update({
-													nilai: data[0].total
-												},{
-													where:{
-														[Op.and]: [{
-															id_permohonan: req.params.id_permohonan,
-														},{
-															id_barang: req.params.id_barang
-														}]
+		await model.v_detail_by_header.findOne({
+			where: {
+				[Op.and]: [{
+					id_permohonan: req.query.id_permohonan
+				},{
+					id_barang: req.query.id_barang
+				}]
+			}
+		}).then(async (result)=>{
+			const[data, metadata] = await db.query(`select
+															SUM(A.nilai) as total
+													from
+															masterlist.td_detail_masterlistbarang A
+													inner join
+															masterlist.td_hdr_masterlistbarang B ON A.id_barang = B.id_barang
+													where
+															B.id_permohonan = :id_permohonan
+													AND
+															A.id_barang = :id_barang`,{
+													replacements: {
+														id_permohonan: req.params.id_permohonan,
+														id_barang: req.params.id_barang
 													}
-												},{
-													transaction: t
-												}).then((result)=>{
-													t.commit();
-													console.log('berhasil');
 												});
-											}
+				if(data[0].total != 0 && data[0].total != ''){
+					console.log(data);
+					await model.masterListBarang.update({
+						nilai: data[0].total
+					},{
+						where:{
+							[Op.and]: [{
+								id_permohonan: req.params.id_permohonan,
+							},{
+								id_barang: req.params.id_barang
+							}]
+						}
+					},{
+						transaction: t
+					}).then((result)=>{
+						t.commit();
+						console.log('berhasil');
+					});
+				}
 
-											if(result[0].length > 0){
-												res.status(200).json({
-													code: '01',
-													message: 'Sukses',
-													data: result[0]
-												});
-											}else{
-												res.status(200).json({
-													code: '01',
-													message: 'Tidak ada data',
-													data: []
-												});
-											}
-									}).catch((err)=>{
-										res.status(404).json({
-											code: '02',
-											message: 'Tidak dapat menampilkan data',
-											data: []
-										})
-									});
+				if(result[0].length > 0){
+					res.status(200).json({
+						code: '01',
+						message: 'Sukses',
+						data: result[0]
+					});
+				}else{
+					res.status(200).json({
+						code: '01',
+						message: 'Tidak ada data',
+						data: []
+					});
+				}
+		}).catch((err)=>{
+			res.status(400).json({
+				code: '02',
+				message: 'Tidak dapat menampilkan data',
+				data: []
+			})
+		});
 	}catch(err){
-		res.status(200).json({
+		res.status(400).json({
 			code: '02',
 			message: 'Terjadi Kesalahan',
 			data: []
@@ -207,94 +113,38 @@ controller.getOne = async function(req, res){
 }
 
 controller.getOneUpdate = async function(req, res){
-	await db.query(`SELECT
-							DISTINCT
-								A.*,
-								B.id_hscode,
-								B.hd_code_format,
-								B.id_takik,
-								B.uraian_id,
-								B.uraian_en,
-								B.bm_mfn,
-								B.no_skep,
-								B.tanggal_skep,
-								B.berlaku AS berlaku_hscode,
-								b.fl_use,
-								b.create_dt,
-								C.ur_satuan,
-								D.ur_incoterm,
-								E.ur_valuta,
-								F.kd_dokumen,
-								F.nomor_dokumen,
-								F.tgl_dokumen,
-								F.filename_dokumen,
-								F.id_permohonan,
-								F.no_seri_dokumen,
-								F.nib,
-								G.ur_jenis_dokumen,
-								H.id_permohonan
-						FROM
-							masterlist.td_detail_masterlistbarang A
-						LEFT JOIN
-							refrensi.tr_hscode B ON A.kd_hs = B.kd_hs
-						LEFT JOIN
-							refrensi.tr_satuan C ON A.kd_satuan = C.kd_satuan
-						LEFT JOIN
-							refrensi.tr_incoterm D ON A.incoterm = D.incoterm
-						LEFT JOIN
-							refrensi.tr_valuta E ON A.kd_valuta = E.kd_valuta
-						LEFT JOIN
-							masterlist.td_dokumen F ON A.id_dokumen = F.id_dokumen
-						LEFT JOIN
-							refrensi.tr_jenis_dokumen G on F.kd_dokumen = G.kd_dokumen
-						LEFT JOIN
-							masterlist.td_hdr_masterlistbarang H ON A.id_barang = H.id_barang
-						WHERE
-							A.id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
-								replacements: {
-									id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
-								}
-							}).then(async (result1)=>{
-								const [result2, metadata] = await db.query(`SELECT
-																					A.id_detailbrg_pelabuhan,
-																					A.id_detailmasterlist_barang,
-																					A.kd_negara||'-'||C.ur_negara data_negara,
-																					A.kd_pelabuhan||'-'||B.ur_pelabuhan data_pelabuhan,
-																					A.type
-																			FROM 
-																				masterlist.td_detailbrg_pelabuhan A
-																			LEFT JOIN
-																				refrensi.tr_pelabuhan B ON A.kd_pelabuhan = B.kd_pelabuhan
-																			LEFT JOIN
-																				refrensi.tr_negara C ON A.kd_negara = C.kd_negara
-																			WHERE
-																				A.id_detailmasterlist_barang = :id_detailmasterlist_barang`,{
-																					replacements: {
-																						id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
-																					}
-																				});
-								if(result2.length > 0){
-									res.status(200).json({
-										code: '01',
-										message: 'Sukses',
-										detailBarang: result1[0],
-										detailPelabuhan: result2[0]
-									});
-								}else{
-									res.status(200).json({
-										code: '01',
-										message: 'Sukses',
-										detailBarang: result1[0],
-										detailPelabuhan: []
-									});
-								}
-							}).catch((err)=>{
-								res.status(404).json({
-									code: '02',
-									message: 'Tidak dapat menampilkan data',
-									data: []
-								})
-							});
+	await model.v_detail_by_header.findOne({
+		where: {
+			id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
+		}
+	}).then(async (result1)=>{
+			await model.v_detail_pelabuhan.findOne({
+				where:{
+					id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
+				}
+			}).then(async (result2)=>{
+				res.status(200).json({
+					code: '01',
+					message: 'Sukses',
+					detailBarang: result1,
+					detailPelabuhan: result2
+				});
+			}).catch((err)=>{
+				res.status(400).json({
+					code: '02',
+					message: 'Gagal',
+					detailBarang: [],
+					detailPelabuhan: []
+				});
+			});
+		}).catch((err)=>{
+			res.status(400).json({
+				code: '02',
+				message: 'Gagal',
+				detailBarang: [],
+				detailPelabuhan: []
+			});
+		});
 }
 
 controller.insert =  async function(req, res){
@@ -377,52 +227,50 @@ controller.update = async function(req, res){
 		},{
 			trasaction: t
 		}).then(async (result)=>{
-				if(ObjectLength == 2){
-					var berhasil = 0;
-					const updateBarangPelabuhan = updateData.detailPelabuhan;
-					for(var i=0 ; i<updateBarangPelabuhan.length; i++){
-						if(updateBarangPelabuhan[i].id_detailbrg_pelabuhan != 0){
-							const validasi = await model.M_DetailBarangPelabuhan.update(updateBarangPelabuhan[i],{
-								where:{
-									[Op.and]: [
-										{id_detailmasterlist_barang: req.params.id_detailmasterlist_barang},
-										{id_detailbrg_pelabuhan: updateBarangPelabuhan[i].id_detailbrg_pelabuhan}]
-									}
-								},{
-									trasaction: t
+			var berhasil = 0;
+			const updateBarangPelabuhan = updateData.detailPelabuhan;
+			const deletePelabuhan = updateData.deletePelabuhan;
+			for(var index=1; index< ObjectLength; index++){
+				if(index == 1){
+					if(updateBarangPelabuhan.length != 0){
+						for(var i=0 ; i<updateBarangPelabuhan.length; i++){
+							if(updateBarangPelabuhan[i].id_detailbrg_pelabuhan != ''){
+								const validasi = await model.M_DetailBarangPelabuhan.update(updateBarangPelabuhan[i],{
+									where:{
+											id_detailbrg_pelabuhan: updateBarangPelabuhan[i].id_detailbrg_pelabuhan
+										}
+									},{
+										trasaction: t
+									});
+							}else{
+								delete updateBarangPelabuhan[i].id_detailbrg_pelabuhan;
+								Object.assign(updateBarangPelabuhan[i], {id_detailmasterlist_barang: req.params.id_detailmasterlist_barang});
+								const validasi = await model.M_DetailBarangPelabuhan.create(updateBarangPelabuhan[i],{
+									transaction: t
 								});
-						}else{
-							delete updateBarangPelabuhan[i].id_detailbrg_pelabuhan;
-							Object.assign(updateBarangPelabuhan[i], {id_detailmasterlist_barang: req.params.id_detailmasterlist_barang});
-							const validasi = await model.M_DetailBarangPelabuhan.create(updateBarangPelabuhan[i],{
+							}
+						}
+					}
+				}else{
+					if(deletePelabuhan.length != 0){
+						for(var i=0; i<deletePelabuhan.length; i++){
+							await model.M_DetailBarangPelabuhan.destroy({
+								where: {
+									id_detailbrg_pelabuhan: deletePelabuhan[i].id_detailbrg_pelabuhan
+								}
+							},{
 								transaction: t
 							});
 						}
-						if(validasi){
-							berhasil++;
-						}
-					  }
-					if(berhasil == updateBarangPelabuhan.length){
-						t.commit();
-						res.status(200).json({
-							code: '01',
-							message: 'Sukses'
-						});
-					}else{
-						t.rollback();
-						res.status(404).json({
-							code: '02',
-							message: 'Tidak Berhasil Merubah Data',
-							data: []
-						});
 					}
-				}else{
-					t.commit();
-					res.status(200).json({
-						code: '01',
-						message: 'Sukses'
-					});
 				}
+			}
+					
+			t.commit();
+			res.status(200).json({
+				code: '01',
+				message: 'Sukses'
+			});
 		}).catch((err)=>{
 			t.rollback();
 			res.status(404).json({
@@ -501,8 +349,6 @@ controller.delete = async function(req, res){
 									});
 								});
 							});
-
-
 }
 
 

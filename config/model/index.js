@@ -63,6 +63,8 @@ const M_PengajuanMasterlist = require('./masterlist/M_PengajuanMasterlist');
 const v_masterlist_head = require('./view/v_masterlist_head');
 const v_masterlist_detail = require('./view/v_masterlist_detail');
 const v_korespodensi = require('./view/v_korespodensi');
+const v_detail_by_header = require('./view/v_detail_by_header');
+const v_detail_pelabuhan = require('./view/v_detail_pelabuhan');
 /*end model view*/
 
 /*model log*/
@@ -121,6 +123,8 @@ model.M_PengajuanMasterlist = M_PengajuanMasterlist;
 model.v_masterlist_head = v_masterlist_head;
 model.v_masterlist_detail = v_masterlist_detail;
 model.v_korespodensi = v_korespodensi;
+model.v_detail_by_header = v_detail_by_header;
+model.v_detail_pelabuhan = v_detail_pelabuhan;
 /*model view*/
 
 model.tb_log = log.tb_log;

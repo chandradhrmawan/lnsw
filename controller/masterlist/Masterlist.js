@@ -52,9 +52,8 @@ controller.filterMasterlist  = async (req,res,next) => {
         response.page       = req.query.page;
 
         let role            = (req.query.user_role == 'admin_kek') ? '1' : '0';
-        //console.log(role);
-
-        response.result = await model.v_masterlist_head.findAndCountAll({
+        
+        response.result = await view.v_masterlist_head.findAndCountAll({
             attributes : [
                             ['no','no'],
                             ['id_permohonan','nomor_pengajuan'],
@@ -364,6 +363,14 @@ controller.updateMasterList = async(req,res,next) => {
 
 
 controller.update = async function (req, res, next) {
+
+    if(req.params.id_permohonan == "updateData"){
+        res.status(404).json({
+            code: '02',
+            message: 'Error Not Found'
+        });
+        return
+    }
     await model.masterList.update({
         id_pemohonan_parent: req.body.PermohonanParent,
         kd_jenis_permohonan: req.body.kdJenisPermohonan,
