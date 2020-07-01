@@ -105,6 +105,7 @@ controller.filterMasterlist  = async (req,res,next) => {
         let max_length = response.result.rows.length
         response.total_page = Math.ceil(response.result.count/limit);
         for (var i = 0; i < max_length; i++) {
+            response.result.rows[i].dataValues.no = i+1;
             response.result.rows[i].dataValues.action = {
                 status_proses:response.result.rows[i].dataValues.status_proses,
                 nomor_pengajuan:response.result.rows[i].dataValues.nomor_pengajuan
