@@ -102,12 +102,12 @@ controller.getOne = async function(req, res){
 }
 
 controller.getOneUpdate = async function(req, res){
-	await model.v_detail_by_header.findOne({
+	await model.v_detail_by_header.findAll({
 		where: {
 			id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
 		}
 	}).then(async (result1)=>{
-			await model.v_detail_pelabuhan.findOne({
+			await model.v_detail_pelabuhan.findAll({
 				where:{
 					id_detailmasterlist_barang: req.query.id_detailmasterlist_barang
 				}

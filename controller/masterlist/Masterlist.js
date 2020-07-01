@@ -40,6 +40,24 @@ controller.getAll = async function (req, res, next) {
     })
 };
 
+controller.find = async (req,res,next) => {
+    id_permohonan = req.query.id_permohonan;
+    await model.masterList.findOne({
+        where : {
+            id_permohonan : id_permohonan
+        }
+    })
+    .then((ress)=> {
+        res.status(200).json({
+            code: '01',
+            message: 'Sukses',
+            data: ress
+        });
+    }).catch((err)=> {
+
+    })
+}
+
 controller.filterMasterlist  = async (req,res,next) => {
 
     try{
@@ -336,7 +354,7 @@ controller.updateMasterList = async(req,res,next) => {
 
         if(rs7.status == '2'){
             log_param.id_permohonan = req.params.id_permohonan;
-            log_param.action_type   = "Update";
+            log_param.action_type   = "Kirim Permohonan";
             log_param.kd_layanan    = "1";
             log_param.username      = rs1.email;
             log_param.payload.push(ret);
