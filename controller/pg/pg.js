@@ -5,7 +5,39 @@ const controller = {};
 
 
 controller.getView = async (req,res,next) => {
-    console.log(view);
+    let id_permohonan = req.query.id_permohonan;
+    let response = {}
+    await view.v_pengajuan_masterlist.findAll({
+        where : {
+            nomor_pengajuan : id_permohonan
+        }
+    })
+    .then(ress => {
+        console.log(ress[0]);
+        response.data_pengajuan = (ress[0]) ? ress[0].dataValues : [];
+        console.log(response);
+
+        
+
+        /*res.status(200).json({
+             code: '01',
+             message: 'Success',
+             data:ress
+        });*/
+       /*}else{
+        res.status(200).json({
+             code: '02',
+             message: 'Data Not Found',
+             data:{}
+        });
+       }*/
+    }).catch(err => {
+        res.status(400).json({
+             code: '02',
+             message: 'Error',
+             data:err
+        });
+    })
 }
 
 controller.getAll = async function (req, res, next) {

@@ -149,7 +149,7 @@
                 }
             }
         },
-        "/api/hscode_mobile?title=":{
+        "/api/hscode_mobile?q=":{
             "get":{
                 "tags":[
                     "Mobile-API"
@@ -162,7 +162,34 @@
                 "parameters":[
                     {
                         "in": "query",
-                        "name": "title",
+                        "name": "keyword",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Search Keyword"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sukses"
+                    }
+                }
+            }
+        },
+        "/api/lartas?q=":{
+            "get":{
+                "tags":[
+                    "Mobile-API"
+                ],
+                "summary": "Get Lartas",
+                "description": "",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters":[
+                    {
+                        "in": "query",
+                        "name": "keyword",
                         "schema": {
                             "type": "string"
                         },

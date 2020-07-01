@@ -7,46 +7,86 @@ const {validationResult} = require('express-validator');
 const db = require('../../config/database/database');
 
 controller.getAll = async function (req, res) {
-    const today = moment(Date.now());
-    const weekstart = moment().startOf('isoweek');
-    const rabu = moment().startOf('isoweek').add(2, 'days');
-    const weekend = moment().endOf('isoweek');
-    const selasa = moment().endOf('isoweek').add(2, 'days');
-    console.log(weekstart, rabu, weekend, selasa);
-    await model.kurs.findAll({
-        attributes: [
-            ['kd_kurs', 'kdKurs'],
-            ['tgawal', 'tanggalAwal'],
-            ['tgakhir', 'tanggalAkhir'],
-            ['nilai', 'nilai'],
-            ['ket', 'keterangan'],
-            ['create_dt', 'create_date']
-        ],
-        where : {
-            create_dt: {
-                [Op.between]: [rabu, selasa]
-            }
-        }
-    })
-        .then((result) => {
-            if (result.length > 0) {
-                res.status(200).json({
-                    code: '01',
-                    message: 'Sukses',
-                    data: result
-                });
-            } else {
-                res.status(404).json({
-                    code: '01',
-                    message: 'Tidak Ada Data'
-                });
-            }
-        }).catch((err) => {
-            res.status(400).json({
-                code: '02',
-                message: err
+    let today = moment(Date.now()).utcOffset('+0700');
+    let start_period = null;
+    let end_period = null;
+    const days = today.format('dddd')
+
+    if(days == 'Wednesday') {
+      start_period = today.clone().utcOffset('+0700').format('YYYY-MM-DD')
+      end_period = today.clone().utc('+0700').add(6, 'days').format('YYYY-MM-DD')
+    } else if(days == 'Tuesday') {
+      start_period = today.clone().utcOffset('+0700').subtract(6, 'days').format('YYYY-MM-DD')
+      end_period = today.clone().utcOffset('+0700').format('YYYY-MM-DD')
+      // console.log('selasa')
+    } else if(days == 'Thursday') {
+      start_period = today.clone().utc('+0700').subtract(1, 'days').format('YYYY-MM-DD')
+      end_period = today.clone().utc('+0700').add(5, 'days').format('YYYY-MM-DD')
+    } else if(days == 'Friday') {
+      start_period = today.clone().utc('+0700').subtract(2, 'days').format('YYYY-MM-DD')
+      end_period = today.clone().utc('+0700').add(4, 'days').format('YYYY-MM-DD')
+      // console.log('jumat')
+    } else if(days == 'Sunday') {
+      start_period = today.clone().utc('+0700').subtract(3, 'days').format('YYYY-MM-DD')
+      end_period = today.clone().utc('+0700').add(2, 'days').format('YYYY-MM-DD')
+      // console.log('minggu')
+    } else {
+      start_period = today.clone().utc('+0700').subtract(4, 'days').format('YYYY-MM-DD')
+      end_period = today.clone().utc('+0700').add(1, 'days').format('YYYY-MM-DD')
+      // console.log('senin')
+    }
+
+    await db.query(`SELECT "kd_kurs" AS "kdKurs", "tgawal" AS "tanggalAwal", "tgakhir" AS "tanggalAkhir", "nilai" AS "nilai", "ket" AS "keterangan", "create_dt" AS "create_date" FROM "refrensi"."tr_kurs" AS "tr_kurs" WHERE "tr_kurs"."tgawal" >= '`+start_period+`' AND "tr_kurs"."tgakhir" <= '`+end_period+`'`)
+    .then((result)=>{
+        // console.log(result[0].length);
+        if(result[0].length > 0){
+            res.status(200).json({
+                code: '01',
+                message: 'Sukses',
+                data: result[0]
             });
-        })
+        }else{
+            res.status(200).json({
+                code: '02',
+                message: 'Sukses',
+                data: 'Tidak ada Data'
+            });
+        }
+    });
+    // await model.kurs.findAll({
+    //     attributes: [
+    //         ['kd_kurs', 'kdKurs'],
+    //         ['tgawal', 'tanggalAwal'],
+    //         ['tgakhir', 'tanggalAkhir'],
+    //         ['nilai', 'nilai'],
+    //         ['ket', 'keterangan'],
+    //         ['create_dt', 'create_date']
+    //     ],
+    //     where : {
+    //         tgawal: {
+    //             [Op.between]: [rabu, selasa]
+    //         }
+    //     }
+    // })
+    //     .then((result) => {
+    //         if (result.length > 0) {
+    //             res.status(200).json({
+    //                 code: '01',
+    //                 message: 'Sukses',
+    //                 data: result
+    //             });
+    //         } else {
+    //             res.status(404).json({
+    //                 code: '01',
+    //                 message: 'Tidak Ada Data'
+    //             });
+    //         }
+    //     }).catch((err) => {
+    //         res.status(400).json({
+    //             code: '02',
+    //             message: err
+    //         });
+    //     })
 };
 
 controller.get = async function (req, res) {
@@ -176,7 +216,7 @@ controller.update = async function(req, res){
             code: '02',
             message: errInput
         });
-    }	
+    }
 };
 
 module.exports = controller;
