@@ -39,7 +39,7 @@ controller.getAll = async function(req, res){
 controller.getOne = async function(req, res){
 	let t = await db.transaction();
 	try{
-		await model.v_detail_by_header.findOne({
+		await model.v_detail_by_header.findAll({
 			where: {
 				[Op.and]: [{
 					id_permohonan: req.query.id_permohonan
@@ -83,19 +83,11 @@ controller.getOne = async function(req, res){
 					});
 				}
 
-				if(result[0].length > 0){
-					res.status(200).json({
-						code: '01',
-						message: 'Sukses',
-						data: result[0]
-					});
-				}else{
-					res.status(200).json({
-						code: '01',
-						message: 'Tidak ada data',
-						data: []
-					});
-				}
+				res.status(200).json({
+					code: '01',
+					message: 'Sukses',
+					data: result[0]
+				});
 		}).catch((err)=>{
 			res.status(400).json({
 				code: '02',
@@ -351,5 +343,6 @@ controller.delete = async function(req, res){
 							});
 }
 
-
+function SanitizeDetailForm(params){
+}
 module.exports = controller;
