@@ -15,7 +15,7 @@
     "dotenv": "^8.2.0",
     "elasticsearch": "^16.7.1",
     "express": "~4.16.1",
-    "express-fileupload": "^1.1.7-alpha.3",
+    "express-fileupload": "^1.1.9",
     "express-validator": "^6.5.0",
     "helmet": "^3.22.0",
     "hex2dec": "^1.1.2",
