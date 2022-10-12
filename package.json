@@ -36,7 +36,7 @@
     "pug": "2.0.0-beta11",
     "random-hexadecimal": "^1.0.3",
     "randomstring": "^1.1.5",
-    "read-excel-file": "^4.0.6",
+    "read-excel-file": "^5.5.1",
     "sanitize": "^2.1.0",
     "sequelize": "^5.21.12",
     "strip-hex-prefix": "^1.0.0",
